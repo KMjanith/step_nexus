@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Center(
                         child: Image.asset(
-                          'images/Pasted_image-removebg-preview.png',
+                          'assets/Pasted_image-removebg-preview.png',
                           width: 100,
                           height: 100,
                         ),

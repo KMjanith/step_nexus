@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:walking_nexus/pages/WalkingDashboard.dart';
 
 class OptionsPage extends StatelessWidget {
   const OptionsPage({super.key});
@@ -30,8 +31,7 @@ class OptionsPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          PlaceholderPage("Walking/Running Dashboard")),
+                      builder: (context) => WalkingRunningDashboard()),
                 );
               },
             ),

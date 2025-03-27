@@ -27,7 +27,7 @@ class _SetStepGoalState extends State<SetStepGoal> {
           // Container(
           //   decoration: BoxDecoration(
           //     image: DecorationImage(
-          //       image: AssetImage('images/backgroud.png'), // Change to your image path
+          //       image: AssetImage('assets/backgroud.png'), // Change to your image path
           //       fit: BoxFit.cover,
           //     ),
           //   ),
@@ -43,7 +43,10 @@ class _SetStepGoalState extends State<SetStepGoal> {
                   // Goal Type Selection
                   Text(
                     "Choose Goal Type",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                   SizedBox(height: 10),
                   DropdownButtonFormField<String>(
@@ -51,9 +54,11 @@ class _SetStepGoalState extends State<SetStepGoal> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.lightGreen.shade100.withOpacity(0.8),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10)),
                     ),
-                    items: ["Exact Steps", "Distance-based", "Time-based"].map((goal) {
+                    items: ["Exact Steps", "Distance-based", "Time-based"]
+                        .map((goal) {
                       return DropdownMenuItem(
                         value: goal,
                         child: Text(goal),
@@ -69,7 +74,8 @@ class _SetStepGoalState extends State<SetStepGoal> {
 
                   // Dynamic Input Fields
                   if (_selectedGoalType == "Exact Steps") _buildStepInput(),
-                  if (_selectedGoalType == "Distance-based") _buildDistanceInput(),
+                  if (_selectedGoalType == "Distance-based")
+                    _buildDistanceInput(),
                   if (_selectedGoalType == "Time-based") _buildTimeInput(),
 
                   SizedBox(height: 30),
@@ -83,7 +89,8 @@ class _SetStepGoalState extends State<SetStepGoal> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                       ),
                       child: Text("Set Goal"),
                     ),
@@ -99,25 +106,30 @@ class _SetStepGoalState extends State<SetStepGoal> {
 
   // Widget for Step Input
   Widget _buildStepInput() {
-    return _buildInputField("Enter Step Goal", _stepsController, "e.g., 5000 steps");
+    return _buildInputField(
+        "Enter Step Goal", _stepsController, "e.g., 5000 steps");
   }
 
   // Widget for Distance Input
   Widget _buildDistanceInput() {
-    return _buildInputField("Enter Distance (km)", _distanceController, "e.g., 3.0 km");
+    return _buildInputField(
+        "Enter Distance (km)", _distanceController, "e.g., 3.0 km");
   }
 
   // Widget for Time Input
   Widget _buildTimeInput() {
-    return _buildInputField("Enter Duration (minutes)", _timeController, "e.g., 30 min");
+    return _buildInputField(
+        "Enter Duration (minutes)", _timeController, "e.g., 30 min");
   }
 
   // Generalized Input Field Widget
-  Widget _buildInputField(String label, TextEditingController controller, String hint) {
+  Widget _buildInputField(
+      String label, TextEditingController controller, String hint) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        Text(label,
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         SizedBox(height: 5),
         TextField(
           controller: controller,
