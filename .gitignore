@@ -3,6 +3,7 @@
 *.log
 *.pyc
 *.swp
+*.lock
 .DS_Store
 .atom/
 .build/
@@ -12,7 +13,7 @@
 .swiftpm/
 migrate_working_dir/
 
-# IntelliJ related
+# IntelliJ / Android Studio
 *.iml
 *.ipr
 *.iws
@@ -24,14 +25,16 @@ migrate_working_dir/
 #.vscode/
 
 # Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
 .dart_tool/
+.packages
+.pub/
+.pub-cache/
+build/
 .flutter-plugins
 .flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
+.flutter-versions
+**/doc/api/
+**/ios/Flutter/.last_build_id
 
 # Symbolication related
 app.*.symbols
@@ -39,9 +42,50 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
-/android/app/.cxx/
+# Coverage
+coverage/
 
+# Symbolic links & misc
+symlink/
+
+# iOS
+ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral/
+ios/.symlinks/
+ios/Pods/
+ios/.generated/
+ios/.dart_tool/
+
+# Android
+android/.gradle/
+android/.idea/
+android/local.properties
+android/.flutter-plugins
+android/.flutter-plugins-dependencies
+android/app/debug/
+android/app/profile/
+android/app/release/
+android/app/.cxx/
+
+# macOS
+macos/Flutter/ephemeral/
+macos/Flutter/GeneratedPluginRegistrant.swift
+macos/.flutter-plugins
+macos/.flutter-plugins-dependencies
+macos/build/
+
+# Linux
+linux/flutter/generated_plugin_registrant.*
+linux/flutter/generated_plugins.cmake
+linux/build/
+
+# Windows
+windows/flutter/generated_plugin_registrant.*
+windows/flutter/generated_plugins.cmake
+windows/build/
+
+# Web
+web/.dart_tool/
+
+# VS Code
+.vscode/
