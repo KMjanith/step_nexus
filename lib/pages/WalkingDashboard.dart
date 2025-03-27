@@ -80,7 +80,7 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
                       ),
                     ),
                     Text(
-                      "Last Walk",
+                      "steps",
                       style: TextStyle(color: Colors.black54, fontSize: 16),
                     ),
                   ],
