@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:walking_nexus/componants/DashboardButton.dart';
 import 'package:walking_nexus/pages/SensorDataPage.dart';
-import 'package:walking_nexus/pages/SetStepGoal.dart';
+import 'package:walking_nexus/pages/WalkingRunningDashboard.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,8 +28,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    double lastWalkProgress = lastWalkSteps / lastWalkGoal;
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Step Nexus'),
@@ -45,78 +43,6 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Summary Section
-              Text(
-                "Summary",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildSummaryTile("Total Steps", "$totalSteps"),
-                  _buildSummaryTile("Recorded Days", "$recordedDays"),
-                  _buildSummaryTile("Calories Burned", "$caloriesBurned cal"),
-                ],
-              ),
-              SizedBox(height: 35),
-
-              // Circular Progress (Last Walk)
-              Center(
-                child: CircularPercentIndicator(
-                  radius: 120.0,
-                  lineWidth: 16.0,
-                  percent: lastWalkProgress.clamp(0.0, 1.0),
-                  center: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Image.asset(
-                          'images/Pasted_image-removebg-preview.png',
-                          width: 100,
-                          height: 100,
-                        ),
-                      ),
-                      Text(
-                        "$lastWalkSteps",
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        "Last Walk",
-                        style: TextStyle(color: Colors.black54, fontSize: 16),
-                      ),
-                    ],
-                  ),
-                  progressColor: Colors.green,
-                  backgroundColor: Colors.lightGreen.shade100,
-                  circularStrokeCap: CircularStrokeCap.round,
-                ),
-              ),
-              SizedBox(height: 30),
-
-              // Set Step Goal Button
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SetStepGoal()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                  ),
-                  child: Text("Set Today's Goal"),
-                ),
-              ),
-              SizedBox(height: 20),
-
               Center(
                 child: ElevatedButton(
                   onPressed: () {
@@ -130,10 +56,33 @@ class _HomePageState extends State<HomePage> {
                     foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                   ),
-                  child: Text("View Sensor Data"),
+                  child: Text("Store Sensor Data"),
                 ),
               ),
 
+              Center(
+                child: Column(
+                  mainAxisAlignment:
+                      MainAxisAlignment.spaceEvenly, // Adjust spacing
+                  children: [
+                    Dashboardbutton(
+                      navigaationPage: WalkingRunningDashboard(),
+                      imagePath: 'images/walking-homepage.png',
+                      buttondescription: 'Walking',
+                    ),
+                    Dashboardbutton(
+                      navigaationPage: WalkingRunningDashboard(),
+                      imagePath: 'images/travelling.png',
+                      buttondescription: "Travelling",
+                    ),
+                    Dashboardbutton(
+                      navigaationPage: WalkingRunningDashboard(),
+                      imagePath: 'images/cycling.png',
+                      buttondescription: "Cycling",
+                    ),
+                  ],
+                ),
+              ),
               // Notifications Header
               Text(
                 "Notifications",
@@ -174,18 +123,4 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Widget to create summary tiles
-  Widget _buildSummaryTile(String title, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          title,
-          style: TextStyle(color: Colors.black54, fontSize: 14),
-        ),
-      ],
-    );
-  }
 }
