@@ -31,7 +31,8 @@ class _CyclingDashboardState extends State<CyclingDashboard> {
       isSessionActive = false;
       // Save session data to local database (placeholder)
       print(
-          "Cycling session saved: Distance: $distance km, Speed: $speed km/h, Calories: $caloriesBurned cal");
+        "Cycling session saved: Distance: $distance km, Speed: $speed km/h, Calories: $caloriesBurned cal",
+      );
     });
   }
 
@@ -94,7 +95,9 @@ class _CyclingDashboardState extends State<CyclingDashboard> {
             _buildSessionTile("Distance", "${distance.toStringAsFixed(2)} km"),
             _buildSessionTile("Speed", "${speed.toStringAsFixed(2)} km/h"),
             _buildSessionTile(
-                "Calories Burned", "${caloriesBurned.toStringAsFixed(2)} cal"),
+              "Calories Burned",
+              "${caloriesBurned.toStringAsFixed(2)} cal",
+            ),
             SizedBox(height: 30),
             Center(
               child: ElevatedButton(
@@ -123,10 +126,7 @@ class _CyclingDashboardState extends State<CyclingDashboard> {
             title,
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          Text(
-            value,
-            style: TextStyle(fontSize: 16, color: Colors.black54),
-          ),
+          Text(value, style: TextStyle(fontSize: 16, color: Colors.black54)),
         ],
       ),
     );
