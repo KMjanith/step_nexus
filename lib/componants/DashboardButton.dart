@@ -28,7 +28,7 @@ class Dashboardbutton extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue, Colors.purple], // Gradient colors
+            colors: [Colors.blue, const Color.fromARGB(255, 7, 51, 194),Colors.blue], // Gradient colors
             begin: Alignment.topLeft, // Gradient start position
             end: Alignment.bottomRight, // Gradient end position
           ),

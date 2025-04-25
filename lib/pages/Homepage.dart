@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:walking_nexus/sources/UserMenu.dart';
 import 'package:walking_nexus/componants/DashboardButton.dart';
 import 'package:walking_nexus/pages/SensorDataPage.dart';
 import 'package:walking_nexus/pages/WalkingRunningDashboard.dart';
@@ -43,44 +44,58 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SensorDataPage()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                  ),
-                  child: Text("Store Sensor Data"),
-                ),
-              ),
+              // Center(
+              //   child: ElevatedButton(
+              //     onPressed: () {
+              //       Navigator.push(
+              //         context,
+              //         MaterialPageRoute(builder: (context) => UserMenu()),
+              //       );
+              //     },
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: Colors.blue,
+              //       foregroundColor: Colors.white,
+              //       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+              //     ),
+              //     child: Text("Database Data"),
+              //   ),
+              // ),
+
+              // SizedBox(height: 20),
 
               Center(
-                child: Column(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceEvenly, // Adjust spacing
-                  children: [
-                    Dashboardbutton(
-                      navigaationPage: WalkingRunningDashboard(),
-                      imagePath: 'images/walking-homepage.png',
-                      buttondescription: 'Walking',
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(195, 223, 223, 223),
+                    borderRadius: BorderRadius.circular(8),
+                    
+                    
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      
+                      mainAxisAlignment:
+                          MainAxisAlignment.spaceEvenly, // Adjust spacing
+                      children: [
+                        Dashboardbutton(
+                          navigaationPage: WalkingRunningDashboard(),
+                          imagePath: 'images/walking-homepage.png',
+                          buttondescription: 'Walking',
+                        ),
+                        Dashboardbutton(
+                          navigaationPage: WalkingRunningDashboard(),
+                          imagePath: 'images/travelling.png',
+                          buttondescription: "Travelling",
+                        ),
+                        Dashboardbutton(
+                          navigaationPage: WalkingRunningDashboard(),
+                          imagePath: 'images/cycling.png',
+                          buttondescription: "Cycling",
+                        ),
+                      ],
                     ),
-                    Dashboardbutton(
-                      navigaationPage: WalkingRunningDashboard(),
-                      imagePath: 'images/travelling.png',
-                      buttondescription: "Travelling",
-                    ),
-                    Dashboardbutton(
-                      navigaationPage: WalkingRunningDashboard(),
-                      imagePath: 'images/cycling.png',
-                      buttondescription: "Cycling",
-                    ),
-                  ],
+                  ),
                 ),
               ),
               // Notifications Header
@@ -121,6 +136,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  // Widget to create summary tiles
 }
