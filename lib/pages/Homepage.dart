@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:walking_nexus/pages/CyclingDashboard.dart';
+import 'package:walking_nexus/pages/TravellingDashbaord.dart';
 import 'package:walking_nexus/sources/UserMenu.dart';
 import 'package:walking_nexus/componants/DashboardButton.dart';
 import 'package:walking_nexus/pages/SensorDataPage.dart';
@@ -68,13 +70,10 @@ class _HomePageState extends State<HomePage> {
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(195, 223, 223, 223),
                     borderRadius: BorderRadius.circular(8),
-                    
-                    
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Column(
-                      
                       mainAxisAlignment:
                           MainAxisAlignment.spaceEvenly, // Adjust spacing
                       children: [
@@ -84,14 +83,14 @@ class _HomePageState extends State<HomePage> {
                           buttondescription: 'Walking',
                         ),
                         Dashboardbutton(
-                          navigaationPage: WalkingRunningDashboard(),
-                          imagePath: 'images/travelling.png',
-                          buttondescription: "Travelling",
-                        ),
-                        Dashboardbutton(
-                          navigaationPage: WalkingRunningDashboard(),
+                          navigaationPage: CyclingDashboard(),
                           imagePath: 'images/cycling.png',
                           buttondescription: "Cycling",
+                        ),
+                        Dashboardbutton(
+                          navigaationPage: TravellingDashboard(),
+                          imagePath: 'images/travelling.png',
+                          buttondescription: "Travelling",
                         ),
                       ],
                     ),
