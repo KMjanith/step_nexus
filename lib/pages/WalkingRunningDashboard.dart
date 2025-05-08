@@ -196,12 +196,21 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
               ),
             ),
             const SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SensorDataPage()),
+            const Text(
+              "Session Logs",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: ListView.builder(
+                itemCount: sessionLogs.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Text(
+                      sessionLogs[index],
+                      style: const TextStyle(fontSize: 16, color: Colors.black54),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
