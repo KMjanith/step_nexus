@@ -27,15 +27,17 @@ class Dashboardbutton extends StatelessWidget {
         height: 105,
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue, const Color.fromARGB(255, 7, 51, 194),Colors.blue], // Gradient colors
-            begin: Alignment.topLeft, // Gradient start position
-            end: Alignment.bottomRight, // Gradient end position
+          border: Border.all(
+            color: const Color.fromARGB(115, 0, 104, 122),
+            width: 2,
+          ),  
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20), // Top left corner radius
+            bottomRight: Radius.circular(90), // Bottom right corner radius
           ),
-          borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2), // Shadow color with opacity
+              color: const Color.fromARGB(255, 0, 216, 180).withOpacity(0.2), // Shadow color with opacity
               spreadRadius: 2, // How much the shadow spreads
               blurRadius: 8, // How soft the shadow is
               offset: Offset(4, 4), // Position of the shadow (x, y)
@@ -66,14 +68,14 @@ class Dashboardbutton extends StatelessWidget {
             Text(
               buttondescription,
               style: TextStyle(
-                color: const Color.fromARGB(255, 255, 255, 255),
+                color: const Color.fromARGB(255, 88, 0, 0),
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Icon(
               Icons.arrow_forward, // Right arrow icon
-              color: const Color.fromARGB(255, 255, 255, 255),
+              color: const Color.fromARGB(255, 0, 189, 157),
               size: 32,
             ),
           ],
