@@ -225,6 +225,12 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 30, vertical: 12),
+                      //border raious
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      //width 100%
+                      minimumSize: Size(double.infinity, 50),
                     ),
                     child: const Text('Confirm Target'),
                   ),

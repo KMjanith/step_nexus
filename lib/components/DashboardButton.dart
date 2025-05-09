@@ -48,7 +48,7 @@ class Dashboardbutton extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: const Color.fromARGB(255, 4, 217, 255),
+                  color: const Color.fromARGB(115, 0, 104, 122),
                   width: 2,
                 ),
               ),
@@ -71,7 +71,7 @@ class Dashboardbutton extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward, // Right arrow icon
-              color: const Color.fromARGB(255, 0, 189, 157),
+              color: const Color.fromARGB(115, 0, 104, 122),
               size: 32,
             ),
           ],

@@ -103,15 +103,15 @@ class _HomePageState extends State<HomePage> {
                           ),
                           Dashboardbutton(
                             onPressed: () => _navigateToTargetSelection(
-                                context, Activity.travelling),
-                            imagePath: 'images/travelling.png',
-                            buttondescription: 'Travelling',
-                          ),
-                          Dashboardbutton(
-                            onPressed: () => _navigateToTargetSelection(
                                 context, Activity.cycling),
                             imagePath: 'images/cycling.png',
                             buttondescription: 'Cycling',
+                          ),
+                          Dashboardbutton(
+                            onPressed: () => _navigateToTargetSelection(
+                                context, Activity.travelling),
+                            imagePath: 'images/travelling.png',
+                            buttondescription: 'Travelling',
                           ),
                         ],
                       ),
