@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class Dashboardbutton extends StatelessWidget {
-  Widget navigaationPage;
+  final VoidCallback onPressed;
   String imagePath;
   String buttondescription;
 
   Dashboardbutton(
-      {required this.navigaationPage,
+      {required this.onPressed,
       required this.imagePath,
       required this.buttondescription,
       super.key});
@@ -15,12 +15,7 @@ class Dashboardbutton extends StatelessWidget {
   Widget build(BuildContext context) {
     // This widget is a button that navigates to the WalkingRunningDashboard page when tapped.
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => navigaationPage),
-        );
-      },
+      onTap: onPressed,
       child: Container(
         width: 350,
         margin: EdgeInsets.only(bottom: 8, top: 8),
@@ -30,14 +25,15 @@ class Dashboardbutton extends StatelessWidget {
           border: Border.all(
             color: const Color.fromARGB(115, 0, 104, 122),
             width: 2,
-          ),  
+          ),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20), // Top left corner radius
             bottomRight: Radius.circular(90), // Bottom right corner radius
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color.fromARGB(255, 0, 216, 180).withOpacity(0.2), // Shadow color with opacity
+              color: const Color.fromARGB(255, 0, 216, 180)
+                  .withOpacity(0.2), // Shadow color with opacity
               spreadRadius: 2, // How much the shadow spreads
               blurRadius: 8, // How soft the shadow is
               offset: Offset(4, 4), // Position of the shadow (x, y)
@@ -52,7 +48,7 @@ class Dashboardbutton extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: const Color.fromARGB(255, 4, 217, 255),
+                  color: const Color.fromARGB(115, 0, 104, 122),
                   width: 2,
                 ),
               ),
@@ -75,7 +71,7 @@ class Dashboardbutton extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward, // Right arrow icon
-              color: const Color.fromARGB(255, 0, 189, 157),
+              color: const Color.fromARGB(115, 0, 104, 122),
               size: 32,
             ),
           ],

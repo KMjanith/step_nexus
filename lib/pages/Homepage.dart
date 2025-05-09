@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:walking_nexus/pages/CyclingDashboard.dart';
-import 'package:walking_nexus/pages/TravellingDashbaord.dart';
-import 'package:walking_nexus/componants/DashboardButton.dart';
+import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
+import 'package:walking_nexus/pages/TravellingDashboard.dart';
+import 'package:walking_nexus/components/DashboardButton.dart';
 import 'package:walking_nexus/pages/WalkingRunningDashboard.dart';
+
+enum Activity { walking, cycling, travelling }
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,6 +29,15 @@ class _HomePageState extends State<HomePage> {
     "Reminder: Stay hydrated while walking.",
     "Check your progress in the stats section."
   ];
+
+  void _navigateToTargetSelection(BuildContext context, Activity activity) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TargetSelectionScreen(activity: activity),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,19 +96,22 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Dashboardbutton(
-                            navigaationPage: WalkingRunningDashboard(),
+                            onPressed: () => _navigateToTargetSelection(
+                                context, Activity.walking),
                             imagePath: 'images/walking-homepage.png',
                             buttondescription: 'Walking',
                           ),
                           Dashboardbutton(
-                            navigaationPage: TravellingDashboard(),
-                            imagePath: 'images/travelling.png',
-                            buttondescription: "Travelling",
+                            onPressed: () => _navigateToTargetSelection(
+                                context, Activity.cycling),
+                            imagePath: 'images/cycling.png',
+                            buttondescription: 'Cycling',
                           ),
                           Dashboardbutton(
-                            navigaationPage: CyclingDashboard(),
-                            imagePath: 'images/cycling.png',
-                            buttondescription: "Cycling",
+                            onPressed: () => _navigateToTargetSelection(
+                                context, Activity.travelling),
+                            imagePath: 'images/travelling.png',
+                            buttondescription: 'Travelling',
                           ),
                         ],
                       ),
