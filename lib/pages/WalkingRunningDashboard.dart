@@ -4,6 +4,9 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:walking_nexus/pages/SensorDataPage.dart';
 import 'package:walking_nexus/services/CountingSteps.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math' show cos, sqrt, asin, pi;
 
 class WalkingRunningDashboard extends StatefulWidget {
   const WalkingRunningDashboard({super.key});
@@ -18,12 +21,17 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
   double distance = 0.0; // in kilometers
   int steps = 0;
   double caloriesBurned = 0.0;
+  double weight = 70.0; // Default weight in kg
+  Position? lastPosition;
   double speed = 0.0; // in km/h
   int totalSteps = 150000; // Example total step count
   int recordedDays = 30; // Example recorded days
 
   int lastWalkSteps = 3500; // Last recorded walk steps
   int lastWalkGoal = 5000; // Last walk goal
+
+  StreamSubscription<Position>? positionStream;
+  Timer? calorieTimer;
 
   StreamSubscription? _accelerometerSub;
   int windowSize = 20;
@@ -49,7 +57,16 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     accelSub?.cancel();
   }
 
-  void startSession() {
+  void startSession() async {
+    bool hasPermission = await _requestPermissions();
+    if (!hasPermission) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text('Location permission is required to start the session.')),
+      );
+      return;
+    }
     setState(() {
       isSessionActive = true;
       steps = 0;
@@ -57,6 +74,7 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
       caloriesBurned = 0.0;
       speed = 0.0;
       elapsedTime = Duration.zero;
+      sessionStartTime = DateTime.now();
     });
 
     // Start the timer
@@ -77,6 +95,8 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     });
 
     startSensorCollection();
+    _startTrackingSpeed();
+    _startCalorieCalculation();
   }
 
   void stopSession() {
@@ -96,6 +116,73 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
       caloriesBurned = steps * 0.04; // example: 0.04 cal per step
       speed = 0.0;
     });
+    positionStream?.cancel();
+    calorieTimer?.cancel();
+  }
+
+  Future<bool> _requestPermissions() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return false;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return false;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      await Geolocator.openAppSettings();
+      return false;
+    }
+
+    return true;
+  }
+
+  void _startTrackingSpeed() {
+    positionStream = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 5, // Update every 5 meters
+      ),
+    ).listen((Position position) {
+      setState(() {
+        speed = position.speed * 3.6; // Convert m/s to km/h
+        if (lastPosition != null) {
+          double distanceMeters = Geolocator.distanceBetween(
+            lastPosition!.latitude,
+            lastPosition!.longitude,
+            position.latitude,
+            position.longitude,
+          );
+          distance += distanceMeters / 1000.0; // Convert to km
+        }
+        lastPosition = position;
+      });
+    }, onError: (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error tracking location: $error')),
+      );
+    });
+  }
+
+  void _startCalorieCalculation() {
+    const double met = 6.0; // MET for moderate cycling
+    calorieTimer = Timer.periodic(const Duration(seconds: 60), (timer) {
+      if (!isSessionActive) {
+        timer.cancel();
+        return;
+      }
+      final durationHours =
+          DateTime.now().difference(sessionStartTime!).inSeconds / 3600.0;
+      setState(() {
+        caloriesBurned = met * weight * durationHours;
+      });
+    });
   }
 
   @override
@@ -113,7 +200,7 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
         (duration.inMilliseconds.remainder(1000) ~/ 10)
             .toString()
             .padLeft(2, '0');
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds.$twoDigitMilliseconds";
+    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 
   @override
@@ -176,6 +263,25 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
                         color: Colors.black54,
                         fontWeight: FontWeight.bold),
                   ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+              // Speed Display
+              Center(
+                child: Column(
+                  children: [
+                    const Text(
+                      "Current Speed",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "${speed.toStringAsFixed(2)} km/h",
+                      style: const TextStyle(fontSize: 30, color: Colors.green),
+                    ),
+                  ],
                 ),
               ),
 
