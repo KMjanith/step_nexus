@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:walking_nexus/pages/SensorDataPage.dart';
+import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
 import 'package:walking_nexus/services/CountingSteps.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math' show cos, sqrt, asin, pi;
 
 class WalkingRunningDashboard extends StatefulWidget {
-  const WalkingRunningDashboard({super.key});
+  final Target target;
+
+  const WalkingRunningDashboard({required this.target, super.key});
 
   @override
   _WalkingRunningDashboardState createState() =>

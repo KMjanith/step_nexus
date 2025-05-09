@@ -5,8 +5,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:math' show cos, sqrt, asin, pi;
 
+import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
+
 class CyclingDashboard extends StatefulWidget {
-  const CyclingDashboard({super.key});
+  final Target target;
+
+  const CyclingDashboard({required this.target, super.key});
 
   @override
   _CyclingDashboardState createState() => _CyclingDashboardState();

@@ -5,8 +5,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math' show cos, sqrt, asin, pi;
 
+import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
+
 class TravellingDashboard extends StatefulWidget {
-  const TravellingDashboard({super.key});
+  final Target target;
+
+  const TravellingDashboard({required this.target, super.key});
 
   @override
   _TravellingDashboardState createState() => _TravellingDashboardState();
