@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'package:walking_nexus/pages/Homepage.dart';
 import 'package:walking_nexus/pages/SensorDataPage.dart';
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
 import 'package:walking_nexus/services/CountingSteps.dart';
@@ -100,6 +101,23 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     startSensorCollection();
     _startTrackingSpeed();
     _startCalorieCalculation();
+
+    //loop to run every 4s
+    Timer.periodic(const Duration(seconds: 4), (Timer t) {
+      if (!isSessionActive) {
+        t.cancel();
+        return;
+      }
+
+      countedMagnitudes = Countingsteps.countStepsFromData(sensorData);
+
+      steps = countedMagnitudes.length;
+      setState(() {
+        // Update the UI or perform any other actions
+        // For example, you can update the distance or steps here
+        // distance += 0.1; // Example increment
+      });
+    });
   }
 
   void stopSession() {
@@ -206,9 +224,58 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 
+  double _calculateProgress() {
+    if (widget.target.type == 'steps') {
+      return (steps / widget.target.value).clamp(0.0, 1.0);
+    } else if (widget.target.type == 'distance') {
+      return (distance / widget.target.value).clamp(0.0, 1.0);
+    } else if (widget.target.type == 'time') {
+      if (sessionStartTime == null) return 0.0;
+      double hoursElapsed =
+          DateTime.now().difference(sessionStartTime!).inSeconds / 3600.0;
+      return (hoursElapsed / widget.target.value).clamp(0.0, 1.0);
+    }
+    return 0.0;
+  }
+
+  void setNewTarget() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TargetSelectionScreen(
+          activity: Activity.walking,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    double lastWalkProgress = lastWalkSteps / lastWalkGoal;
+    double progress = _calculateProgress();
+    bool isTargetAchieved = progress >= 1.0;
+
+    String progressText;
+    if (isTargetAchieved) {
+      progressText = 'Target Achieved';
+    } else {
+      switch (widget.target.type) {
+        case 'steps':
+          progressText = '${steps.toInt()}';
+          break;
+        case 'distance':
+          progressText = '${distance.toStringAsFixed(2)}';
+          break;
+        case 'time':
+          double hoursElapsed = sessionStartTime != null
+              ? DateTime.now().difference(sessionStartTime!).inMinutes / 60.0
+              : 0.0;
+          progressText = '${hoursElapsed.toStringAsFixed(2)}';
+          break;
+        default:
+          progressText = 'N/A';
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Walking/Running Dashboard"),
@@ -226,7 +293,7 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
                 child: CircularPercentIndicator(
                   radius: 120.0,
                   lineWidth: 16.0,
-                  percent: lastWalkProgress.clamp(0.0, 1.0),
+                  percent: progress,
                   center: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -236,20 +303,26 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
                         height: 100,
                       ),
                       Text(
-                        "$lastWalkSteps",
+                        progressText,
                         style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
                       ),
-                      const Text(
-                        "steps",
+                      Text(
+                        widget.target.type == 'steps'
+                            ? "steps"
+                            : widget.target.type == 'distance'
+                                ? "km"
+                                : "hours",
                         style: TextStyle(color: Colors.black54, fontSize: 16),
                       ),
                     ],
                   ),
-                  progressColor: Colors.green,
+                  progressColor: isTargetAchieved
+                      ? Colors.amber.shade700
+                      : Colors.green.shade700,
                   backgroundColor: Colors.lightGreen.shade100,
                   circularStrokeCap: CircularStrokeCap.round,
                 ),
@@ -271,20 +344,63 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
 
               const SizedBox(height: 30),
               // Speed Display
+              // Center(
+              //   child: Column(
+              //     children: [
+              //       const Text(
+              //         "Current Speed",
+              //         style:
+              //             TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              //       ),
+              //       const SizedBox(height: 10),
+              //       Text(
+              //         "${speed.toStringAsFixed(2)} km/h",
+              //         style: const TextStyle(fontSize: 30, color: Colors.green),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+
+              //target
+              const SizedBox(height: 40),
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(109, 255, 255, 255),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                  child: _buildSessionTile(
+                      "Target",
+                      "${widget.target.value.toStringAsFixed(2)} ${widget.target.type == 'steps' ? 'steps' : widget.target.type == 'distance' ? 'km' : 'hours'}"),
+                ),
+              ),
+
+              SizedBox(height: 10),
               Center(
-                child: Column(
-                  children: [
-                    const Text(
-                      "Current Speed",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                child: ElevatedButton(
+                  onPressed: setNewTarget,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(237, 255, 255, 255),
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    //border raious
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      "${speed.toStringAsFixed(2)} km/h",
-                      style: const TextStyle(fontSize: 30, color: Colors.green),
+                    //width 100%
+                    minimumSize: Size(double.infinity, 50),
+                    //border color
+                    side: const BorderSide(
+                      color: Colors.green,
+                      width: 1,
                     ),
-                  ],
+                  ),
+                  child: Text(
+                    "Set New Target",
+                    style: TextStyle(color: Colors.green, fontSize: 16),
+                  ),
+                  //Text color
                 ),
               ),
 
@@ -326,6 +442,12 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 30, vertical: 12),
+                    //border raious
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    //width 100%
+                    minimumSize: Size(double.infinity, 50),
                   ),
                   child:
                       Text(isSessionActive ? "Stop Session" : "Start Session"),
@@ -345,6 +467,12 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 30, vertical: 12),
+                    //border raious
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    //width 100%
+                    minimumSize: Size(double.infinity, 50),
                   ),
                   child: const Text("Store Sensor Data"),
                 ),

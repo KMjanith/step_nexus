@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:walking_nexus/pages/Homepage.dart';
 import 'dart:async';
 import 'dart:math' show cos, sqrt, asin, pi;
 
@@ -167,112 +168,230 @@ class _CyclingDashboardState extends State<CyclingDashboard> {
     return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 
+  double _calculateProgress() {
+    if (widget.target.type == 'distance') {
+      return (distance / widget.target.value).clamp(0.0, 1.0);
+    } else if (widget.target.type == 'time') {
+      if (sessionStartTime == null) return 0.0;
+      double hoursElapsed =
+          DateTime.now().difference(sessionStartTime!).inSeconds / 3600.0;
+      return (hoursElapsed / widget.target.value).clamp(0.0, 1.0);
+    }
+    return 0.0;
+  }
+
+  void setNewTarget() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TargetSelectionScreen(
+          activity: Activity.cycling,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    double lastCycleProgress = lastCycleDistance / lastCycleTarget;
+    double progress = _calculateProgress();
+    bool isTargetAchieved = progress >= 1.0;
+
+    String progressText;
+    if (isTargetAchieved) {
+      progressText = 'Target Achieved';
+    } else {
+      switch (widget.target.type) {
+        case 'distance':
+          progressText = '${distance.toStringAsFixed(2)}';
+          break;
+        case 'time':
+          double hoursElapsed = sessionStartTime != null
+              ? DateTime.now().difference(sessionStartTime!).inMinutes / 60.0
+              : 0.0;
+          progressText = '${hoursElapsed.toStringAsFixed(2)}';
+          break;
+        default:
+          progressText = 'N/A';
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Cycling Dashboard"),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 240, 240, 240),
         elevation: 0,
       ),
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Circular Progress (Last Walk)
-            Center(
-              child: CircularPercentIndicator(
-                radius: 120.0,
-                lineWidth: 16.0,
-                percent: lastCycleProgress.clamp(0.0, 1.0),
-                center: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: Image.asset(
+      backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: CircularPercentIndicator(
+                  radius: 120.0,
+                  lineWidth: 16.0,
+                  percent: progress,
+                  center: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
                         'images/cycling.png',
                         width: 100,
                         height: 100,
                       ),
-                    ),
-                    Text(
-                      "$lastCycleDistance",
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                      Text(
+                        progressText,
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                    Text(
-                      "km",
-                      style: TextStyle(color: Colors.black54, fontSize: 16),
-                    ),
-                  ],
-                ),
-                progressColor: Colors.green,
-                backgroundColor: Colors.lightGreen.shade100,
-                circularStrokeCap: CircularStrokeCap.round,
-              ),
-            ),
-            //timer
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  formatDuration(elapsedTime),
-                  style: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
+                      Text(
+                        widget.target.type == 'steps'
+                            ? "steps"
+                            : widget.target.type == 'distance'
+                                ? "km"
+                                : "hours",
+                        style: TextStyle(color: Colors.black54, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  progressColor: isTargetAchieved
+                      ? Colors.amber.shade700
+                      : Colors.green.shade700,
+                  backgroundColor: Colors.lightGreen.shade100,
+                  circularStrokeCap: CircularStrokeCap.round,
                 ),
               ),
-            ),
 
-            const SizedBox(height: 30),
-            // Speed Display
-            Center(
-              child: Column(
-                children: [
-                  const Text(
-                    "Current Speed",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              //timer
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    formatDuration(elapsedTime),
+                    style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.black54,
+                        fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    "${speed.toStringAsFixed(2)} km/h",
-                    style: const TextStyle(fontSize: 30, color: Colors.green),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 30),
-            Text(
-              "Session Details",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            _buildSessionTile("Distance", "${distance.toStringAsFixed(2)} km"),
-            _buildSessionTile("Speed", "${speed.toStringAsFixed(2)} km/h"),
-            _buildSessionTile(
-              "Calories Burned",
-              "${caloriesBurned.toStringAsFixed(2)} cal",
-            ),
-            SizedBox(height: 30),
-            Center(
-              child: ElevatedButton(
-                onPressed: isSessionActive ? stopSession : startSession,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isSessionActive ? Colors.red : Colors.green,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                 ),
-                child: Text(isSessionActive ? "Stop Session" : "Start Session"),
               ),
-            ),
-          ],
+
+              const SizedBox(height: 30),
+              // Speed Display
+              // Center(
+              //   child: Column(
+              //     children: [
+              //       const Text(
+              //         "Current Speed",
+              //         style:
+              //             TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              //       ),
+              //       const SizedBox(height: 10),
+              //       Text(
+              //         "${speed.toStringAsFixed(2)} km/h",
+              //         style: const TextStyle(fontSize: 30, color: Colors.green),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+
+              //target
+              const SizedBox(height: 40),
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(109, 255, 255, 255),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                  child: _buildSessionTile(
+                      "Target",
+                      "${widget.target.value.toStringAsFixed(2)} ${widget.target.type == 'steps' ? 'steps' : widget.target.type == 'distance' ? 'km' : 'hours'}"),
+                ),
+              ),
+
+              SizedBox(height: 10),
+              Center(
+                child: ElevatedButton(
+                  onPressed: setNewTarget,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(237, 255, 255, 255),
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    //border raious
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    //width 100%
+                    minimumSize: Size(double.infinity, 50),
+                    //border color
+                    side: const BorderSide(
+                      color: Colors.green,
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    "Set New Target",
+                    style: TextStyle(color: Colors.green, fontSize: 16),
+                  ),
+                  //Text color
+                ),
+              ),
+
+              //session details
+              const SizedBox(height: 15),
+              const Text(
+                "Session Details",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(109, 255, 255, 255),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                  child: Column(
+                    children: [
+                      _buildSessionTile(
+                          "Distance", "${distance.toStringAsFixed(2)} km"),
+                      _buildSessionTile("Calories Burned",
+                          "${caloriesBurned.toStringAsFixed(2)} cal"),
+                      _buildSessionTile(
+                          "Speed", "${speed.toStringAsFixed(2)} km/h"),
+                    ],
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 30),
+              Center(
+                child: ElevatedButton(
+                  onPressed: isSessionActive ? stopSession : startSession,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        isSessionActive ? Colors.red : Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    //border raious
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    //width 100%
+                    minimumSize: Size(double.infinity, 50),
+                  ),
+                  child:
+                      Text(isSessionActive ? "Stop Session" : "Start Session"),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
