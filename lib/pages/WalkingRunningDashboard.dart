@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:walking_nexus/pages/SensorDataPage.dart';
+import 'package:walking_nexus/services/CountingSteps.dart';
 
 class WalkingRunningDashboard extends StatefulWidget {
   const WalkingRunningDashboard({super.key});
@@ -27,12 +26,17 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
   int lastWalkGoal = 5000; // Last walk goal
 
   StreamSubscription? _accelerometerSub;
-  List<double> _magnitudes = [];
   int windowSize = 20;
   DateTime? sessionStartTime;
 
   List<AccelerometerEvent> sensorData = [];
   StreamSubscription<AccelerometerEvent>? accelSub;
+
+  List<String> countedMagnitudes = [];
+
+  // Timer-related variables
+  Duration elapsedTime = Duration.zero;
+  Timer? timer;
 
   void startSensorCollection() {
     sensorData.clear();
@@ -45,27 +49,6 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     accelSub?.cancel();
   }
 
-  int countStepsFromData(List<AccelerometerEvent> data) {
-    int steps = 0;
-    double threshold = 11; // Adjust this based on testing
-    bool wasAbove = false;
-
-    for (final event in data) {
-     double magnitude = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
-
-
-      if (magnitude > threshold) {
-        if (!wasAbove) {
-          steps++;
-          wasAbove = true;
-        }
-      } else {
-        wasAbove = false;
-      }
-    }
-    return steps;
-  }
-
   void startSession() {
     setState(() {
       isSessionActive = true;
@@ -73,13 +56,38 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
       distance = 0.0;
       caloriesBurned = 0.0;
       speed = 0.0;
+      elapsedTime = Duration.zero;
     });
+
+    // Start the timer
+    timer = Timer.periodic(const Duration(milliseconds: 10), (Timer t) {
+      setState(() {
+        int milliseconds = elapsedTime.inMilliseconds + 10;
+        if (milliseconds % 1000 == 0) {
+          // Increment seconds when milliseconds reach 1000
+          elapsedTime = Duration(seconds: elapsedTime.inSeconds + 1);
+        } else {
+          // Update milliseconds manually
+          elapsedTime = Duration(
+            seconds: elapsedTime.inSeconds,
+            milliseconds: milliseconds % 1000,
+          );
+        }
+      });
+    });
+
     startSensorCollection();
   }
 
   void stopSession() {
     stopSensorCollection();
-    int estimatedSteps = countStepsFromData(sensorData);
+    // Stop the timer
+    timer?.cancel();
+
+    //int estimatedSteps = Countingsteps.countStepsFromData(sensorData);
+    countedMagnitudes = Countingsteps.countStepsFromData(sensorData);
+
+    int estimatedSteps = countedMagnitudes.length;
 
     setState(() {
       isSessionActive = false;
@@ -90,38 +98,22 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     });
   }
 
-  void _processMagnitude(double magnitude) {
-    _magnitudes.add(magnitude);
-    if (_magnitudes.length > windowSize) {
-      _magnitudes.removeAt(0);
-    }
-
-    double mean = _magnitudes.reduce((a, b) => a + b) / _magnitudes.length;
-    double stdDev = sqrt(
-        _magnitudes.map((m) => pow(m - mean, 2)).reduce((a, b) => a + b) /
-            _magnitudes.length);
-
-    if (magnitude > mean + stdDev * 1.2) {
-      steps++;
-      distance = steps * 0.0008; // ~0.8 meters per step
-      caloriesBurned = steps * 0.04; // ~0.04 cal per step
-
-      if (sessionStartTime != null) {
-        Duration elapsed = DateTime.now().difference(sessionStartTime!);
-        double hours = elapsed.inSeconds / 3600.0;
-        if (hours > 0) {
-          speed = distance / hours;
-        }
-      }
-
-      setState(() {});
-    }
-  }
-
   @override
   void dispose() {
     _accelerometerSub?.cancel();
+    timer?.cancel();
     super.dispose();
+  }
+
+  String formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    String twoDigitMilliseconds =
+        (duration.inMilliseconds.remainder(1000) ~/ 10)
+            .toString()
+            .padLeft(2, '0');
+    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds.$twoDigitMilliseconds";
   }
 
   @override
@@ -130,90 +122,136 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Walking/Running Dashboard"),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 240, 240, 240),
         elevation: 0,
       ),
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: CircularPercentIndicator(
-                radius: 120.0,
-                lineWidth: 16.0,
-                percent: lastWalkProgress.clamp(0.0, 1.0),
-                center: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'images/Pasted_image-removebg-preview.png',
-                      width: 100,
-                      height: 100,
-                    ),
-                    Text(
-                      "$lastWalkSteps",
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+      backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: CircularPercentIndicator(
+                  radius: 120.0,
+                  lineWidth: 16.0,
+                  percent: lastWalkProgress.clamp(0.0, 1.0),
+                  center: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'images/Pasted_image-removebg-preview.png',
+                        width: 100,
+                        height: 100,
                       ),
+                      Text(
+                        "$lastWalkSteps",
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const Text(
+                        "steps",
+                        style: TextStyle(color: Colors.black54, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  progressColor: Colors.green,
+                  backgroundColor: Colors.lightGreen.shade100,
+                  circularStrokeCap: CircularStrokeCap.round,
+                ),
+              ),
+
+              //timer
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    formatDuration(elapsedTime),
+                    style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.black54,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+
+              //session details
+              const SizedBox(height: 15),
+              const Text(
+                "Session Details",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(109, 255, 255, 255),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                  child: Column(
+                    children: [
+                      _buildSessionTile(
+                          "Distance", "${distance.toStringAsFixed(2)} km"),
+                      _buildSessionTile("Steps", "$steps"),
+                      _buildSessionTile("Calories Burned",
+                          "${caloriesBurned.toStringAsFixed(2)} cal"),
+                      _buildSessionTile(
+                          "Speed", "${speed.toStringAsFixed(2)} km/h"),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+              Center(
+                child: ElevatedButton(
+                  onPressed: isSessionActive ? stopSession : startSession,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        isSessionActive ? Colors.red : Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 12),
+                  ),
+                  child:
+                      Text(isSessionActive ? "Stop Session" : "Start Session"),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SensorDataPage()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 12),
+                  ),
+                  child: const Text("Store Sensor Data"),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Column(
+                children: [
+                  for (String magnitude in countedMagnitudes)
+                    Text(
+                      magnitude,
+                      style: const TextStyle(fontSize: 14, color: Colors.black),
                     ),
-                    const Text(
-                      "steps",
-                      style: TextStyle(color: Colors.black54, fontSize: 16),
-                    ),
-                  ],
-                ),
-                progressColor: Colors.green,
-                backgroundColor: Colors.lightGreen.shade100,
-                circularStrokeCap: CircularStrokeCap.round,
-              ),
-            ),
-            const SizedBox(height: 30),
-            const Text(
-              "Session Details",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            _buildSessionTile("Distance", "${distance.toStringAsFixed(2)} km"),
-            _buildSessionTile("Steps", "$steps"),
-            _buildSessionTile(
-                "Calories Burned", "${caloriesBurned.toStringAsFixed(2)} cal"),
-            _buildSessionTile("Speed", "${speed.toStringAsFixed(2)} km/h"),
-            const SizedBox(height: 30),
-            Center(
-              child: ElevatedButton(
-                onPressed: isSessionActive ? stopSession : startSession,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isSessionActive ? Colors.red : Colors.green,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                ),
-                child: Text(isSessionActive ? "Stop Session" : "Start Session"),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SensorDataPage()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                ),
-                child: const Text("Store Sensor Data"),
-              ),
-            ),
-          ],
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
