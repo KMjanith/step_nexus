@@ -102,22 +102,24 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     _startTrackingSpeed();
     _startCalorieCalculation();
 
+    //countedMagnitudes = Countingsteps.countStepsFromData(sensorData);
+
     //loop to run every 4s
-    Timer.periodic(const Duration(seconds: 4), (Timer t) {
-      if (!isSessionActive) {
-        t.cancel();
-        return;
-      }
+    // Timer.periodic(const Duration(seconds: 4), (Timer t) {
+    //   if (!isSessionActive) {
+    //     t.cancel();
+    //     return;
+    //   }
 
-      countedMagnitudes = Countingsteps.countStepsFromData(sensorData);
+    //   countedMagnitudes = Countingsteps.countStepsFromData(sensorData);
 
-      steps = countedMagnitudes.length;
-      setState(() {
-        // Update the UI or perform any other actions
-        // For example, you can update the distance or steps here
-        // distance += 0.1; // Example increment
-      });
-    });
+    //   steps = countedMagnitudes.length;
+    //   setState(() {
+    //     // Update the UI or perform any other actions
+    //     // For example, you can update the distance or steps here
+    //     // distance += 0.1; // Example increment
+    //   });
+    // });
   }
 
   void stopSession() {
@@ -126,7 +128,7 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     timer?.cancel();
 
     //int estimatedSteps = Countingsteps.countStepsFromData(sensorData);
-    countedMagnitudes = Countingsteps.countStepsFromData(sensorData);
+    countedMagnitudes = Countingsteps.countSteps(sensorData);
 
     int estimatedSteps = countedMagnitudes.length;
 

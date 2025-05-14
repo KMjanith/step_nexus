@@ -2,46 +2,47 @@ import 'dart:math';
 import 'package:sensors_plus/sensors_plus.dart';
 
 class Countingsteps {
-  static  List<String> countStepsFromData(List<AccelerometerEvent> data) {
-    List<String> magnitudes = [];
+  static List<String> countSteps(List<AccelerometerEvent> data) {
+    List<String> detectedSteps = [];
+    if (data.length < 3) return detectedSteps;
 
-    if (data.isEmpty) {
-      print("No accelerometer data available.");
-      return [];
+    double threshold = 11.5;
+    int minStepIntervalMs = 400;
+
+    double value1 = magnitude(data[0]);
+    double value2 = magnitude(data[1]);
+    double value3 = magnitude(data[2]);
+
+    int lastStepTime = data[1].timestamp.millisecondsSinceEpoch ?? 0;
+
+    if (isStep(value1, value2, value3, threshold)) {
+      detectedSteps.add("M: ${value2.toStringAsFixed(2)}, time: $lastStepTime");
     }
 
-    double threahsold = 11.5;
+    for (int i = 3; i < data.length; i++) {
+      value1 = value2;
+      value2 = value3;
+      value3 = magnitude(data[i]);
 
-    int end = data.length;
-    double value_1 = sqrt(
-        data[0].x * data[0].x + data[0].y * data[0].y + data[0].z * data[0].z);
-    double value_2 = sqrt(
-        data[1].x * data[1].x + data[1].y * data[1].y + data[1].z * data[1].z);
-    double value_3 = sqrt(
-        data[2].x * data[2].x + data[2].y * data[2].y + data[2].z * data[2].z);
+      int currentTime = data[i].timestamp.millisecondsSinceEpoch ?? 0;
 
-    if (value_2 > value_1 && value_2 > value_3 && value_2 > threahsold) {
-      print("Step detected at index 1 with magnitude $value_2");
-        magnitudes.add("M: ${value_2.toString()} , time: ${data[1].timestamp}");
-    }
-
-  
-
-    for (int i = 3; i < end; i++) {
-      value_1 = value_2;
-      value_2 = value_3;
-      value_3 = sqrt(data[i].x * data[i].x +
-          data[i].y * data[i].y +
-          data[i].z * data[i].z);
-      if (value_2 > value_1 && value_2 > value_3 &&
-          value_2 > threahsold) {
-        print("Step detected at index 1 with magnitude $value_2");
-        magnitudes.add("M: ${value_2.toString()} , time: ${data[i].timestamp}");
+      if (isStep(value1, value2, value3, threshold)) {
+        if (currentTime - lastStepTime > minStepIntervalMs) {
+          detectedSteps
+              .add("M: ${value2.toStringAsFixed(2)}, time: $currentTime");
+          lastStepTime = currentTime;
+        }
       }
-
     }
 
-    return magnitudes;
+    return detectedSteps;
   }
 
+  static bool isStep(double v1, double v2, double v3, double threshold) {
+    return v2 > v1 && v2 > v3 && v2 > threshold;
+  }
+
+  static double magnitude(AccelerometerEvent e) {
+    return sqrt(e.x * e.x + e.y * e.y + e.z * e.z);
+  }
 }
