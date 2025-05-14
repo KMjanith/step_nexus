@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
 import 'dart:async';
 import 'dart:math' show cos, sqrt, asin, pi;

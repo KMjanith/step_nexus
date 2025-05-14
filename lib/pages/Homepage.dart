@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:walking_nexus/pages/CyclingDashboard.dart';
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
-import 'package:walking_nexus/pages/TravellingDashboard.dart';
 import 'package:walking_nexus/components/DashboardButton.dart';
-import 'package:walking_nexus/pages/WalkingRunningDashboard.dart';
+import 'package:walking_nexus/sources/database_helper.dart';
 
 enum Activity { walking, cycling, travelling }
 
@@ -15,13 +13,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int totalSteps = 150000; // Example total step count
-  int recordedDays = 30; // Example recorded days
-  int caloriesBurned = 5200; // Example calorie count
-
-  int lastWalkSteps = 3500; // Last recorded walk steps
-  int lastWalkGoal = 5000; // Last walk goal
-
   List<String> notifications = [
     "You've been idle for 2 hours. Time to walk!",
     "Great job! You completed 80% of your weekly goal.",
@@ -29,6 +20,73 @@ class _HomePageState extends State<HomePage> {
     "Reminder: Stay hydrated while walking.",
     "Check your progress in the stats section."
   ];
+
+  final dummySessions = [
+    {
+      'time_based': 1,
+      'distance_based': 0,
+      'step_based': 0,
+      'target_steps': null,
+      'target_distance': null,
+      'target_time': 1800,
+      'result_steps': 2400,
+      'result_distance': 1.5,
+      'result_avg_speed': 3.0,
+      'burned_calories': 120.5,
+      'time_spend': 1800,
+      'date': '2025-05-14',
+    },
+    {
+      'time_based': 0,
+      'distance_based': 1,
+      'step_based': 0,
+      'target_steps': null,
+      'target_distance': 2.0,
+      'target_time': null,
+      'result_steps': 3200,
+      'result_distance': 2.1,
+      'result_avg_speed': 3.5,
+      'burned_calories': 145.0,
+      'time_spend': 1200,
+      'date': '2025-05-13',
+    },
+    {
+      'time_based': 0,
+      'distance_based': 0,
+      'step_based': 1,
+      'target_steps': 3000,
+      'target_distance': null,
+      'target_time': null,
+      'result_steps': 3050,
+      'result_distance': 2.3,
+      'result_avg_speed': 4.2,
+      'burned_calories': 155.3,
+      'time_spend': 1500,
+      'date': '2025-05-12',
+    },
+  ];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    //insertDummySessions();
+    //deleteData();
+  }
+
+  void insertDummySessions() async {
+    for (var session in dummySessions) {
+      await DatabaseHelper.instance.insertWalkingSession(session);
+    }
+    print('Dummy sessions inserted');
+  }
+
+  void deleteData() async {
+    var lisstIds = [4, 5, 6];
+    for (var id in lisstIds) {
+      await DatabaseHelper.instance.deleteWalkingSession(id);
+    }
+  }
 
   void _navigateToTargetSelection(BuildContext context, Activity activity) {
     Navigator.push(
@@ -79,11 +137,50 @@ class _HomePageState extends State<HomePage> {
                     height: 100,
                     child: Center(
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 18.0),
-                        child: Text(
-                          "Welcome to Walking Nexus",
-                          style: TextStyle(
-                            fontSize: 24,
+                        padding: const EdgeInsets.only(top: 30.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color.fromARGB(255, 155, 255, 188),
+                                  Color.fromARGB(255, 130, 255, 234),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 5,
+                                  blurRadius: 7,
+                                  offset: Offset(
+                                      0, 3), // changes position of shadow
+                                ),
+                              ],
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30))),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 10.0, bottom: 10, right: 20, left: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  "Welcome to Step Nexus",
+                                  style: TextStyle(
+                                      fontSize: 22,
+                                      color:
+                                          const Color.fromARGB(255, 26, 71, 0),
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily:
+                                          'Roboto'), // Example of a good font
+                                ),
+                                Icon(Icons.health_and_safety_outlined,
+                                    color:
+                                        const Color.fromARGB(255, 175, 88, 88),
+                                    size: 35),
+                              ],
+                            ),
                           ),
                         ),
                       ),
