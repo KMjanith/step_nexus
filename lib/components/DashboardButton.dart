@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class Dashboardbutton extends StatelessWidget {
   final VoidCallback onPressed;
   String imagePath;

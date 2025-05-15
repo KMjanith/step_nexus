@@ -13,7 +13,7 @@ class Countingsteps {
     double value2 = magnitude(data[1]);
     double value3 = magnitude(data[2]);
 
-    int lastStepTime = data[1].timestamp.millisecondsSinceEpoch ?? 0;
+    int lastStepTime = data[1].timestamp.millisecondsSinceEpoch;
 
     if (isStep(value1, value2, value3, threshold)) {
       detectedSteps.add("M: ${value2.toStringAsFixed(2)}, time: $lastStepTime");
@@ -24,7 +24,7 @@ class Countingsteps {
       value2 = value3;
       value3 = magnitude(data[i]);
 
-      int currentTime = data[i].timestamp.millisecondsSinceEpoch ?? 0;
+      int currentTime = data[i].timestamp.millisecondsSinceEpoch;
 
       if (isStep(value1, value2, value3, threshold)) {
         if (currentTime - lastStepTime > minStepIntervalMs) {

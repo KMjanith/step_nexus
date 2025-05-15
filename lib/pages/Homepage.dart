@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:walking_nexus/pages/CyclingDashboard.dart';
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
-import 'package:walking_nexus/pages/TravellingDashboard.dart';
 import 'package:walking_nexus/components/DashboardButton.dart';
-import 'package:walking_nexus/pages/WalkingRunningDashboard.dart';
 
 enum Activity { walking, cycling, travelling }
 
@@ -15,13 +12,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int totalSteps = 150000; // Example total step count
-  int recordedDays = 30; // Example recorded days
-  int caloriesBurned = 5200; // Example calorie count
-
-  int lastWalkSteps = 3500; // Last recorded walk steps
-  int lastWalkGoal = 5000; // Last walk goal
-
   List<String> notifications = [
     "You've been idle for 2 hours. Time to walk!",
     "Great job! You completed 80% of your weekly goal.",
@@ -29,6 +19,16 @@ class _HomePageState extends State<HomePage> {
     "Reminder: Stay hydrated while walking.",
     "Check your progress in the stats section."
   ];
+
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    //insertDummySessions();
+  }
+
 
   void _navigateToTargetSelection(BuildContext context, Activity activity) {
     Navigator.push(
@@ -47,27 +47,6 @@ class _HomePageState extends State<HomePage> {
       // Stack for background and content
       body: Stack(
         children: [
-          // Background
-          // Positioned(
-          //     child: Container(
-          //   height: 550,
-          //   decoration: BoxDecoration(
-          //     gradient: LinearGradient(
-          //       colors: [
-          //         const Color.fromARGB(255, 204, 237, 253),
-          //         const Color.fromARGB(255, 166, 223, 252),
-          //         const Color.fromARGB(255, 73, 180, 233),
-          //       ],
-          //       begin: Alignment.topCenter,
-          //       end: Alignment.bottomCenter,
-          //     ),
-          //     borderRadius: BorderRadius.only(
-          //       bottomLeft: Radius.circular(70),
-          //       bottomRight: Radius.circular(70),
-          //     ),
-          //   ),
-          // )),
-
           // Scrollable Content
           SingleChildScrollView(
             child: Padding(
@@ -79,11 +58,45 @@ class _HomePageState extends State<HomePage> {
                     height: 100,
                     child: Center(
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 18.0),
-                        child: Text(
-                          "Welcome to Walking Nexus",
-                          style: TextStyle(
-                            fontSize: 24,
+                        padding: const EdgeInsets.only(top: 30.0),
+                        child: Container(
+            
+                          decoration: BoxDecoration(
+                              border: Border.all(color: const Color.fromARGB(174, 76, 175, 79), width: 2),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color.fromARGB(255, 128, 255, 228)
+                                      .withOpacity(0.5),
+                                  spreadRadius: 7,
+                                  blurRadius: 7,
+                                  offset: Offset(
+                                      1, 1), // changes position of shadow
+                                ),
+                              ],
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30))),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 10.0, bottom: 10, right: 20, left: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  "Welcome to Step Nexus",
+                                  style: TextStyle(
+                                      fontSize: 22,
+                                      color:
+                                          const Color.fromARGB(255, 26, 71, 0),
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily:
+                                          'Roboto'), // Example of a good font
+                                ),
+                                Icon(Icons.health_and_safety_outlined,
+                                    color:
+                                        const Color.fromARGB(255, 175, 88, 88),
+                                    size: 35),
+                              ],
+                            ),
                           ),
                         ),
                       ),

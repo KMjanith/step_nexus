@@ -2,13 +2,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'package:walking_nexus/components/walkingPastDetails.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
-import 'package:walking_nexus/pages/SensorDataPage.dart';
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
 import 'package:walking_nexus/services/CountingSteps.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:math' show cos, sqrt, asin, pi;
+import 'package:walking_nexus/sources/database_helper.dart';
 
 class WalkingRunningDashboard extends StatefulWidget {
   final Target target;
@@ -23,6 +22,8 @@ class WalkingRunningDashboard extends StatefulWidget {
 class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
   bool isSessionActive = false;
   double distance = 0.0; // in kilometers
+  int startWindow = 0;
+  int endWindow = 200;
   int steps = 0;
   double caloriesBurned = 0.0;
   double weight = 70.0; // Default weight in kg
@@ -49,6 +50,37 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
   // Timer-related variables
   Duration elapsedTime = Duration.zero;
   Timer? timer;
+
+  List<Map<String, dynamic>> data = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadPastSessionData();
+  }
+
+  void _loadPastSessionData() async {
+    final db = DatabaseHelper.instance;
+    List<Map<String, dynamic>> latestSession = [];
+
+    print(widget.target.type);
+    switch (widget.target.type) {
+      case 'steps':
+        latestSession = await db.getStepBasedWalkingSessions();
+        break;
+      case 'distance':
+        latestSession = await db.getDistanceBasedWalkingSessions();
+        break;
+      case 'time':
+        latestSession = await db.getTimeBsedWalkingSessions();
+        break;
+    }
+
+    setState(() {
+      data = latestSession;
+    });
+  }
 
   void startSensorCollection() {
     sensorData.clear();
@@ -82,19 +114,9 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     });
 
     // Start the timer
-    timer = Timer.periodic(const Duration(milliseconds: 10), (Timer t) {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
       setState(() {
-        int milliseconds = elapsedTime.inMilliseconds + 10;
-        if (milliseconds % 1000 == 0) {
-          // Increment seconds when milliseconds reach 1000
-          elapsedTime = Duration(seconds: elapsedTime.inSeconds + 1);
-        } else {
-          // Update milliseconds manually
-          elapsedTime = Duration(
-            seconds: elapsedTime.inSeconds,
-            milliseconds: milliseconds % 1000,
-          );
-        }
+        elapsedTime += const Duration(seconds: 1);
       });
     });
 
@@ -102,24 +124,24 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     _startTrackingSpeed();
     _startCalorieCalculation();
 
-    //countedMagnitudes = Countingsteps.countStepsFromData(sensorData);
-
     //loop to run every 4s
-    // Timer.periodic(const Duration(seconds: 4), (Timer t) {
-    //   if (!isSessionActive) {
-    //     t.cancel();
-    //     return;
-    //   }
+    Timer.periodic(const Duration(seconds: 4), (Timer t) {
+      if (!isSessionActive) {
+        t.cancel();
+        return;
+      }
 
-    //   countedMagnitudes = Countingsteps.countStepsFromData(sensorData);
-
-    //   steps = countedMagnitudes.length;
-    //   setState(() {
-    //     // Update the UI or perform any other actions
-    //     // For example, you can update the distance or steps here
-    //     // distance += 0.1; // Example increment
-    //   });
-    // });
+      if (endWindow <= sensorData.length) {
+        List<AccelerometerEvent> window =
+            sensorData.sublist(startWindow, endWindow);
+        int newSteps = Countingsteps.countSteps(window).length;
+        setState(() {
+          steps += newSteps;
+        });
+        startWindow = endWindow;
+        endWindow += 200;
+      }
+    });
   }
 
   void stopSession() {
@@ -128,19 +150,85 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     timer?.cancel();
 
     //int estimatedSteps = Countingsteps.countStepsFromData(sensorData);
-    countedMagnitudes = Countingsteps.countSteps(sensorData);
+    List<AccelerometerEvent> window =
+        sensorData.sublist(endWindow, sensorData.length);
+    countedMagnitudes = Countingsteps.countSteps(window);
 
     int estimatedSteps = countedMagnitudes.length;
 
     setState(() {
       isSessionActive = false;
-      steps = estimatedSteps;
+      steps = steps + estimatedSteps;
       distance = steps * 0.0008; // example: 0.8 meters per step
       caloriesBurned = steps * 0.04; // example: 0.04 cal per step
       speed = 0.0;
+      startWindow = 0;
+      endWindow = 200;
     });
     positionStream?.cancel();
     calorieTimer?.cancel();
+
+    // Ask the user whether to save the data to the database
+    _showSaveConfirmationDialog(context);
+  }
+
+  Future<void> _showSaveConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Save your journey?'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you done with your ride?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                _saveSessionData();
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _saveSessionData() async {
+    // Save the session data to the database
+    final dbHelper = DatabaseHelper.instance;
+    var type = widget.target.type;
+    double value = widget.target.value;
+    Map<String, dynamic> sessionData = {
+      'time_based': type == 'time' ? 1 : 0,
+      'distance_based': type == 'distance' ? 1 : 0,
+      'step_based': type == 'steps' ? 1 : 0,
+      'target_steps': type == 'steps' ? value : null,
+      'target_distance': type == 'distance' ? value : null,
+      'target_time': type == 'time' ? value : null,
+      'result_steps': steps,
+      'result_distance': distance,
+      'result_avg_speed': speed,
+      'burned_calories': caloriesBurned,
+      'time_spend': elapsedTime.inHours,
+      'date': DateTime.now().toString().substring(0, 10),
+    };
+
+    await dbHelper.insertWalkingSession(sessionData);
+    print('Session data saved to database');
+    _loadPastSessionData();
   }
 
   Future<bool> _requestPermissions() async {
@@ -219,10 +307,6 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    String twoDigitMilliseconds =
-        (duration.inMilliseconds.remainder(1000) ~/ 10)
-            .toString()
-            .padLeft(2, '0');
     return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 
@@ -247,6 +331,36 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
         builder: (context) => TargetSelectionScreen(
           activity: Activity.walking,
         ),
+      ),
+    );
+  }
+
+  void ondelete(int id) async {
+    final db = DatabaseHelper.instance;
+    await db.deleteWalkingSession(id);
+
+    _loadPastSessionData();
+    Navigator.pop(context);
+   
+  }
+
+  // Function to build a session tile
+
+  Widget _buildSessionTile(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 16, color: Colors.black54),
+          ),
+        ],
       ),
     );
   }
@@ -456,61 +570,18 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
                 ),
               ),
               const SizedBox(height: 20),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SensorDataPage()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 12),
-                    //border raious
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    //width 100%
-                    minimumSize: Size(double.infinity, 50),
-                  ),
-                  child: const Text("Store Sensor Data"),
-                ),
+              const Text(
+                "Past Walkings",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
+
               Column(
-                children: [
-                  for (String magnitude in countedMagnitudes)
-                    Text(
-                      magnitude,
-                      style: const TextStyle(fontSize: 14, color: Colors.black),
-                    ),
-                ],
+                children: [for (var i in data) Walkingpastdetails(pastData: i, onDelete: ondelete)],
               )
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSessionTile(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16, color: Colors.black54),
-          ),
-        ],
       ),
     );
   }
