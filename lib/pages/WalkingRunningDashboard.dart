@@ -341,7 +341,6 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
 
     _loadPastSessionData();
     Navigator.pop(context);
-   
   }
 
   // Function to build a session tile
@@ -577,7 +576,10 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
               const SizedBox(height: 20),
 
               Column(
-                children: [for (var i in data) Walkingpastdetails(pastData: i, onDelete: ondelete)],
+                children: [
+                  for (var i in data)
+                    Walkingpastdetails(pastData: i, onDelete: ondelete)
+                ],
               )
             ],
           ),
