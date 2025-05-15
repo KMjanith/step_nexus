@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
-class Walkingpastdetails extends StatelessWidget {
+class Cyclingorwalkingpastdetails extends StatelessWidget {
   Map<String, dynamic> pastData;
   Function? onDelete;
-  Walkingpastdetails({this.onDelete, required this.pastData, super.key});
+  Cyclingorwalkingpastdetails(
+      {required this.pastData, required this.onDelete, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +24,7 @@ class Walkingpastdetails extends StatelessWidget {
             offset: const Offset(4, 4),
           ),
         ],
-        color: (pastData['step_based'] == 1 &&
-                    (pastData['target_steps'] >= pastData['result_steps'])) ||
-                (pastData['distance_based'] == 1 &&
+        color: (pastData['distance_based'] == 1 &&
                     (pastData['target_distance'] >=
                         pastData['result_distance'])) ||
                 (pastData['time_based'] == 1 &&
@@ -75,11 +74,6 @@ class Walkingpastdetails extends StatelessWidget {
                   ),
                 ),
               ),
-              _detailTab(
-                  Icon(Icons.directions_walk,
-                      color: const Color.fromARGB(255, 1, 141, 94)),
-                  "${pastData['result_steps']}",
-                  "steps"),
               _detailTab(
                   Icon(Icons.timelapse,
                       color: const Color.fromARGB(255, 206, 65, 0)),

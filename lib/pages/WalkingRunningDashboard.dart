@@ -7,9 +7,6 @@ import 'package:walking_nexus/pages/Homepage.dart';
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
 import 'package:walking_nexus/services/CountingSteps.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:math' show cos, sqrt, asin, pi;
-
 import 'package:walking_nexus/sources/database_helper.dart';
 
 class WalkingRunningDashboard extends StatefulWidget {
@@ -170,6 +167,68 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     });
     positionStream?.cancel();
     calorieTimer?.cancel();
+
+    // Ask the user whether to save the data to the database
+    _showSaveConfirmationDialog(context);
+  }
+
+  Future<void> _showSaveConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Save your journey?'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you done with your ride?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                _saveSessionData();
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _saveSessionData() async {
+    // Save the session data to the database
+    final dbHelper = DatabaseHelper.instance;
+    var type = widget.target.type;
+    double value = widget.target.value;
+    Map<String, dynamic> sessionData = {
+      'time_based': type == 'time' ? 1 : 0,
+      'distance_based': type == 'distance' ? 1 : 0,
+      'step_based': type == 'steps' ? 1 : 0,
+      'target_steps': type == 'steps' ? value : null,
+      'target_distance': type == 'distance' ? value : null,
+      'target_time': type == 'time' ? value : null,
+      'result_steps': steps,
+      'result_distance': distance,
+      'result_avg_speed': speed,
+      'burned_calories': caloriesBurned,
+      'time_spend': elapsedTime.inHours,
+      'date': DateTime.now().toString().substring(0, 10),
+    };
+
+    await dbHelper.insertWalkingSession(sessionData);
+    print('Session data saved to database');
+    _loadPastSessionData();
   }
 
   Future<bool> _requestPermissions() async {
@@ -272,6 +331,36 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
         builder: (context) => TargetSelectionScreen(
           activity: Activity.walking,
         ),
+      ),
+    );
+  }
+
+  void ondelete(int id) async {
+    final db = DatabaseHelper.instance;
+    await db.deleteWalkingSession(id);
+
+    _loadPastSessionData();
+    Navigator.pop(context);
+   
+  }
+
+  // Function to build a session tile
+
+  Widget _buildSessionTile(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 16, color: Colors.black54),
+          ),
+        ],
       ),
     );
   }
@@ -481,30 +570,6 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Center(
-              //   child: ElevatedButton(
-              //     onPressed: () {
-              //       Navigator.push(
-              //         context,
-              //         MaterialPageRoute(builder: (context) => SensorDataPage()),
-              //       );
-              //     },
-              //     style: ElevatedButton.styleFrom(
-              //       backgroundColor: Colors.blue,
-              //       foregroundColor: Colors.white,
-              //       padding: const EdgeInsets.symmetric(
-              //           horizontal: 30, vertical: 12),
-              //       //border raious
-              //       shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(10),
-              //       ),
-              //       //width 100%
-              //       minimumSize: Size(double.infinity, 50),
-              //     ),
-              //     child: const Text("Store Sensor Data"),
-              //   ),
-              // ),
-
               const Text(
                 "Past Walkings",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -512,30 +577,11 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
               const SizedBox(height: 20),
 
               Column(
-                children: [for (var i in data) Walkingpastdetails(pastData: i)],
+                children: [for (var i in data) Walkingpastdetails(pastData: i, onDelete: ondelete)],
               )
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSessionTile(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16, color: Colors.black54),
-          ),
-        ],
       ),
     );
   }

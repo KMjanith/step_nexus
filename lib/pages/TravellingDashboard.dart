@@ -2,11 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:walking_nexus/components/walkingPastDetails.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
-import 'dart:math' show cos, sqrt, asin, pi;
-
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
+import 'package:walking_nexus/sources/database_helper.dart';
 
 class TravellingDashboard extends StatefulWidget {
   final Target target;
@@ -34,6 +33,34 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
   Duration elapsedTime = Duration.zero;
   Timer? timer;
 
+  List<Map<String, dynamic>> data = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadPastSessionData();
+  }
+
+  void _loadPastSessionData() async {
+    final db = DatabaseHelper.instance;
+    List<Map<String, dynamic>> latestSession = [];
+
+    print(widget.target.type);
+    switch (widget.target.type) {
+      case 'distance':
+        latestSession = await db.getDistanceBasedCyclingOrTravellingSessions('');
+        break;
+      case 'time':
+        latestSession = await db.getTimeBsedCyclingOrTravellingSessions('');
+        break;
+    }
+
+    setState(() {
+      data = latestSession;
+    });
+  }
+
   void startSession() async {
     bool hasPermission = await _requestPermissions();
     if (!hasPermission) {
@@ -51,19 +78,10 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
       sessionStartTime = DateTime.now();
     });
     // Start the timer
-    timer = Timer.periodic(const Duration(milliseconds: 10), (Timer t) {
+    // Start the timer
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
       setState(() {
-        int milliseconds = elapsedTime.inMilliseconds + 10;
-        if (milliseconds % 1000 == 0) {
-          // Increment seconds when milliseconds reach 1000
-          elapsedTime = Duration(seconds: elapsedTime.inSeconds + 1);
-        } else {
-          // Update milliseconds manually
-          elapsedTime = Duration(
-            seconds: elapsedTime.inSeconds,
-            milliseconds: milliseconds % 1000,
-          );
-        }
+        elapsedTime += const Duration(seconds: 1);
       });
     });
     _startTrackingSpeed();
@@ -78,6 +96,9 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
       print("Travel session saved: Distance: $distance km, Speed: $speed km/h");
     });
     positionStream?.cancel();
+
+    // Ask the user whether to save the data to the database
+    _showSaveConfirmationDialog(context);
   }
 
   Future<bool> _requestPermissions() async {
@@ -101,6 +122,69 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
     }
 
     return true;
+  }
+
+  void ondelete(int id) async {
+    final db = DatabaseHelper.instance;
+    await db.deleteWalkingSession(id);
+
+    _loadPastSessionData();
+    Navigator.pop(context);
+  }
+
+  Future<void> _showSaveConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Save your journey?'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you done with your ride?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                _saveSessionData();
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _saveSessionData() async {
+    // Save the session data to the database
+    final dbHelper = DatabaseHelper.instance;
+    var type = widget.target.type;
+    double value = widget.target.value;
+    Map<String, dynamic> sessionData = {
+      'time_based': type == 'time' ? 1 : 0,
+      'distance_based': type == 'distance' ? 1 : 0,
+      'target_distance': type == 'distance' ? value : null,
+      'target_time': type == 'time' ? value : null,
+      'result_distance': distance,
+      'result_avg_speed': speed,
+      'time_spend': elapsedTime.inHours.toDouble(),
+      'date': DateTime.now().toString().substring(0, 10),
+    };
+
+    await dbHelper.insertWalkingSession(sessionData);
+    print('Session data saved to database');
+    _loadPastSessionData();
   }
 
   void _startTrackingSpeed() {
@@ -134,10 +218,6 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    String twoDigitMilliseconds =
-        (duration.inMilliseconds.remainder(1000) ~/ 10)
-            .toString()
-            .padLeft(2, '0');
     return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 
@@ -347,6 +427,20 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
                       Text(isSessionActive ? "Stop Session" : "Start Session"),
                 ),
               ),
+
+              const SizedBox(height: 20),
+              const Text(
+                "Past cylings",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+
+              Column(
+                children: [
+                  for (var i in data)
+                    Walkingpastdetails(pastData: i, onDelete: ondelete)
+                ],
+              )
             ],
           ),
         ),
