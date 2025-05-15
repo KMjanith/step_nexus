@@ -126,7 +126,7 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
 
   void ondelete(int id) async {
     final db = DatabaseHelper.instance;
-    await db.deleteWalkingSession(id);
+    await db.deleteCyclingOrTravellingSession(id, '');
 
     _loadPastSessionData();
     Navigator.pop(context);
@@ -182,7 +182,7 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
       'date': DateTime.now().toString().substring(0, 10),
     };
 
-    await dbHelper.insertWalkingSession(sessionData);
+    await dbHelper.insertCyclingOrTravellingSession(sessionData,'');
     print('Session data saved to database');
     _loadPastSessionData();
   }
