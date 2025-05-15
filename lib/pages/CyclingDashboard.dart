@@ -189,7 +189,7 @@ class _CyclingDashboardState extends State<CyclingDashboard> {
       'result_distance': distance,
       'result_avg_speed': speed,
       'time_spend': elapsedTime.inHours.toDouble(),
-      'calories_burned': caloriesBurned,
+      'burned_calories': caloriesBurned,
       'date': DateTime.now().toString().substring(0, 10),
     };
 

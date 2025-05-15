@@ -4,7 +4,7 @@ import 'package:walking_nexus/sources/database_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  //await DatabaseHelper.instance.deleteDatabaseFile(); // Only for development
+  await DatabaseHelper.instance.deleteDatabaseFile(); // Only for development
   //insertDummySessions();
   //insertDummyCyclingSessions();
   //insertDummyTravellingSessions();
