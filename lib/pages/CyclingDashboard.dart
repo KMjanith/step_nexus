@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:walking_nexus/components/CyclingOrWalkingPastDetails.dart';
-import 'package:walking_nexus/components/walkingPastDetails.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
 import 'dart:async';
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
