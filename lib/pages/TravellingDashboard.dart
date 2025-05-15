@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:walking_nexus/components/walkingPastDetails.dart';
+import 'package:walking_nexus/components/CyclingOrWalkingPastDetails.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
 import 'package:walking_nexus/sources/database_helper.dart';
@@ -438,7 +438,7 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
               Column(
                 children: [
                   for (var i in data)
-                    Walkingpastdetails(pastData: i, onDelete: ondelete)
+                    Cyclingorwalkingpastdetails(pastData: i, onDelete: ondelete)
                 ],
               )
             ],

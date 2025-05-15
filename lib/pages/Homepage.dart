@@ -20,15 +20,12 @@ class _HomePageState extends State<HomePage> {
     "Check your progress in the stats section."
   ];
 
-
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     //insertDummySessions();
   }
-
 
   void _navigateToTargetSelection(BuildContext context, Activity activity) {
     Navigator.push(
@@ -48,6 +45,23 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
         children: [
           // Scrollable Content
+          AppBar(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  "Welcome to Step Nexus",
+                  style: TextStyle(
+                      fontSize: 22,
+                      color: const Color.fromARGB(255, 26, 71, 0),
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Roboto'), // Example of a good font
+                ),
+                Icon(Icons.health_and_safety_outlined,
+                    color: const Color.fromARGB(255, 175, 88, 88), size: 35),
+              ],
+            ),
+          ),
           SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -55,52 +69,7 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    height: 100,
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
-                        child: Container(
-            
-                          decoration: BoxDecoration(
-                              border: Border.all(color: const Color.fromARGB(174, 76, 175, 79), width: 2),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color.fromARGB(255, 128, 255, 228)
-                                      .withOpacity(0.5),
-                                  spreadRadius: 7,
-                                  blurRadius: 7,
-                                  offset: Offset(
-                                      1, 1), // changes position of shadow
-                                ),
-                              ],
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(30))),
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                top: 10.0, bottom: 10, right: 20, left: 20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text(
-                                  "Welcome to Step Nexus",
-                                  style: TextStyle(
-                                      fontSize: 22,
-                                      color:
-                                          const Color.fromARGB(255, 26, 71, 0),
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily:
-                                          'Roboto'), // Example of a good font
-                                ),
-                                Icon(Icons.health_and_safety_outlined,
-                                    color:
-                                        const Color.fromARGB(255, 175, 88, 88),
-                                    size: 35),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    height: 70,
                   ),
                   Center(
                     child: Padding(

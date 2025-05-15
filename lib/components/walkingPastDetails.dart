@@ -15,9 +15,17 @@ class Walkingpastdetails extends StatelessWidget {
         (pastData['time_based'] == 1 &&
             (pastData['target_time'] >= pastData['time_spend']));
 
-    String TARGET_ACHIEVED = "Target Achieved";
-    String TARGET_NOT_ACHIEVED = "Target Not Achieved";
+    String TARGET_ACHIEVED = pastData['step_based'] == 1
+        ? "Step target ${pastData['target_steps']} achieved!"
+        : pastData['distance_based'] == 1
+            ? "Distance target ${pastData['target_distance']} km achieved!"
+            : "Time target ${pastData['target_time']} hrs achieved!";
 
+    String TARGET_NOT_ACHIEVED = pastData['step_based'] == 1
+        ? "Step target ${pastData['target_steps']} not achieved!"
+        : pastData['distance_based'] == 1
+            ? "Distance target ${pastData['target_distance']} km not achieved!"
+            : "Time target ${pastData['target_time']} hrs not achieved!";
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -26,17 +34,8 @@ class Walkingpastdetails extends StatelessWidget {
           color: const Color.fromARGB(255, 214, 214, 214),
           width: 2,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color.fromARGB(255, 0, 216, 180).withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(4, 4),
-          ),
-        ],
-        color: targetAchived
-            ? const Color.fromARGB(255, 255, 210, 210)
-            : const Color.fromARGB(255, 228, 255, 209),
+      
+      
         borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(
@@ -194,7 +193,7 @@ Widget _topicFilling(bool targetAchived) {
           decoration: BoxDecoration(
             color: targetAchived
                 ? const Color.fromARGB(255, 255, 174, 174)
-                : const Color.fromARGB(255, 175, 255, 178),
+                : const Color.fromARGB(255, 18, 199, 24),
           ),
         );
       },
