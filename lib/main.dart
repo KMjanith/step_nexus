@@ -1,10 +1,11 @@
+import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
 import 'package:walking_nexus/sources/database_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await DatabaseHelper.instance.deleteDatabaseFile(); // Only for development
+  //await DatabaseHelper.instance.deleteDatabaseFile(); // Only for development
   //insertDummySessions();
   //insertDummyCyclingSessions();
   //insertDummyTravellingSessions();
@@ -131,7 +132,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(), // Load HomePage
+      home: AnimatedSplashScreen(
+        splashIconSize: 4000.0,
+        backgroundColor: Colors.black,
+        nextScreen: HomePage(),
+        splash: 'images/starting_splash.gif', 
+      ), // Load HomePage
     );
   }
 }
