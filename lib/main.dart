@@ -136,7 +136,27 @@ class MyApp extends StatelessWidget {
         splashIconSize: 4000.0,
         backgroundColor: Colors.black,
         nextScreen: HomePage(),
-        splash: 'images/starting_splash.gif', 
+        splash: Center(
+          child: Column(
+            children: [
+              SizedBox(
+                height: 300,
+              ),
+              Image.asset(
+                'images/startup_anime.gif',
+              ),
+              const Text(
+                'STEP NEXUS',
+                style: TextStyle(
+                  fontSize: 30,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins'
+                ),
+              ),
+            ],
+          ),
+        ),
       ), // Load HomePage
     );
   }

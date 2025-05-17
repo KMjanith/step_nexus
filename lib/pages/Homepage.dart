@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:walking_nexus/components/BottomNavigationButton.dart';
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
 import 'package:walking_nexus/components/DashboardButton.dart';
 
@@ -80,19 +81,19 @@ class _HomePageState extends State<HomePage> {
                           Dashboardbutton(
                             onPressed: () => _navigateToTargetSelection(
                                 context, Activity.walking),
-                            imagePath: 'images/walking-homepage.png',
+                            imagePath: 'images/walking_anime.gif',
                             buttondescription: 'Walking',
                           ),
                           Dashboardbutton(
                             onPressed: () => _navigateToTargetSelection(
                                 context, Activity.cycling),
-                            imagePath: 'images/cycling.png',
+                            imagePath: 'images/cycling_anime.gif',
                             buttondescription: 'Cycling',
                           ),
                           Dashboardbutton(
                             onPressed: () => _navigateToTargetSelection(
                                 context, Activity.travelling),
-                            imagePath: 'images/travelling.png',
+                            imagePath: 'images/travel_anime.gif',
                             buttondescription: 'Travelling',
                           ),
                         ],
@@ -135,6 +136,44 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+          Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 0, 151, 126),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Bottomnavigationbutton(
+                          onPressed: () => _navigateToTargetSelection(
+                              context, Activity.walking),
+                          icon: Icons.nordic_walking,
+                          iconDescription: "Walk"),
+                      Bottomnavigationbutton(
+                          onPressed: () => _navigateToTargetSelection(
+                              context, Activity.cycling),
+                          icon: Icons.pedal_bike,
+                          iconDescription: "Cycle"),
+                      Bottomnavigationbutton(
+                          onPressed: () => _navigateToTargetSelection(
+                              context, Activity.travelling),
+                          icon: Icons.travel_explore,
+                          iconDescription: "Travel"),
+                    ],
+                  ),
+                ),
+              )),
         ],
       ),
     );

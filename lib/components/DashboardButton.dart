@@ -20,7 +20,7 @@ class Dashboardbutton extends StatelessWidget {
       child: Container(
         width: 350,
         margin: EdgeInsets.only(bottom: 8, top: 8),
-        height: 105,
+        height: 125,
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
         decoration: BoxDecoration(
           border: Border.all(
