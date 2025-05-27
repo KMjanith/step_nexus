@@ -6,14 +6,24 @@ class Walkingpastdetails extends StatelessWidget {
   Function? onDelete;
   Walkingpastdetails({this.onDelete, required this.pastData, super.key});
 
+  Duration _parseDuration(String timeString) {
+    List<String> parts = timeString.split(':');
+    int hours = int.parse(parts[0]);
+    int minutes = int.parse(parts[1]);
+    int seconds = int.parse(parts[2]);
+    return Duration(hours: hours, minutes: minutes, seconds: seconds);
+  }
+
   @override
   Widget build(BuildContext context) {
+    print(pastData['target_time']);
     bool targetAchived = (pastData['step_based'] == 1 &&
             (pastData['target_steps'] >= pastData['result_steps'])) ||
         (pastData['distance_based'] == 1 &&
             (pastData['target_distance'] >= pastData['result_distance'])) ||
         (pastData['time_based'] == 1 &&
-            (pastData['target_time'] >= pastData['time_spend']));
+            (pastData['target_time'] >=
+                _parseDuration(pastData['time_spend']).inHours));
 
     String TARGET_ACHIEVED = pastData['step_based'] == 1
         ? "Step target ${pastData['target_steps']} achieved!"
@@ -34,8 +44,6 @@ class Walkingpastdetails extends StatelessWidget {
           color: const Color.fromARGB(255, 214, 214, 214),
           width: 2,
         ),
-      
-      
         borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(
@@ -112,12 +120,12 @@ class Walkingpastdetails extends StatelessWidget {
                       Icon(Icons.timelapse,
                           color: const Color.fromARGB(255, 206, 65, 0)),
                       "${pastData['time_spend']}",
-                      "hrs."),
+                      "hr:min:sec"),
                   _detailTab(
                       Icon(Icons.route,
                           color: const Color.fromARGB(255, 0, 13, 22)),
                       pastData['result_distance'] < 1
-                          ? "${(pastData['result_distance'] * 1000).toStringAsFixed(1)} m"
+                          ? "${(pastData['result_distance'] * 1000).toStringAsFixed(1)}"
                           : "${pastData['result_distance']}",
                       pastData['result_distance'] < 1 ? "m" : "km"),
                   _detailTab(

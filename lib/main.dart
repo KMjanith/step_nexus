@@ -5,10 +5,10 @@ import 'package:walking_nexus/sources/database_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  //await DatabaseHelper.instance.deleteDatabaseFile(); // Only for development
-  //insertDummySessions();
-  //insertDummyCyclingSessions();
-  //insertDummyTravellingSessions();
+  await DatabaseHelper.instance.deleteDatabaseFile(); // Only for development
+  insertDummySessions();
+  insertDummyCyclingSessions();
+  insertDummyTravellingSessions();
   runApp(MyApp());
 }
 
@@ -24,7 +24,7 @@ final dummyWalkingSessions = [
     'result_distance': 1.5,
     'result_avg_speed': 3.0,
     'burned_calories': 120.5,
-    'time_spend': 4,
+    'time_spend': "0:2:5",
     'date': '2025-05-14',
   },
   {
@@ -38,7 +38,7 @@ final dummyWalkingSessions = [
     'result_distance': 2.1,
     'result_avg_speed': 3.5,
     'burned_calories': 145.0,
-    'time_spend': 2,
+    'time_spend': "0:2:5",
     'date': '2025-05-13',
   },
   {
@@ -52,7 +52,7 @@ final dummyWalkingSessions = [
     'result_distance': 2.3,
     'result_avg_speed': 4.2,
     'burned_calories': 155.3,
-    'time_spend': 1,
+    'time_spend': "0:2:5",
     'date': '2025-05-12',
   },
 ];
@@ -72,7 +72,7 @@ final dummycyclingSessions = [
     'target_time': 1800,
     'result_distance': 1.5,
     'result_avg_speed': 3.0,
-    'time_spend': 4,
+    'time_spend': "0:2:5",
     'burned_calories': 120.5,
     'date': '2025-05-14',
   },
@@ -83,7 +83,7 @@ final dummycyclingSessions = [
     'target_time': null,
     'result_distance': 2.1,
     'result_avg_speed': 3.5,
-    'time_spend': 2,
+    'time_spend': "0:2:5",
     'burned_calories': 145.0,
     'date': '2025-05-13',
   },
@@ -105,7 +105,7 @@ final dummyTravellingSessions = [
     'target_time': 1800,
     'result_distance': 1.5,
     'result_avg_speed': 3.0,
-    'time_spend': 4,
+    'time_spend': "0:2:5",
     'date': '2025-05-14',
   },
   {
@@ -115,7 +115,7 @@ final dummyTravellingSessions = [
     'target_time': null,
     'result_distance': 2.1,
     'result_avg_speed': 3.5,
-    'time_spend': 2,
+    'time_spend': "0:2:5",
     'date': '2025-05-13',
   },
 ];

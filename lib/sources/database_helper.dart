@@ -41,7 +41,7 @@ class DatabaseHelper {
         result_distance REAL,
         result_avg_speed REAL,
         burned_calories REAL,
-        time_spend REAL,
+        time_spend TEXT,
         date TEXT NOT NULL
       )
     ''');
@@ -54,7 +54,7 @@ class DatabaseHelper {
         target_time INTEGER,
         result_distance REAL,
         result_avg_speed REAL,
-        time_spend REAL,
+        time_spend TEXT,
         burned_calories REAL,
         date TEXT NOT NULL
       )
@@ -68,7 +68,7 @@ class DatabaseHelper {
         target_time INTEGER,
         result_distance REAL,
         result_avg_speed REAL,
-        time_spend REAL,
+        time_spend TEXT,
         date TEXT NOT NULL
       )
     ''');

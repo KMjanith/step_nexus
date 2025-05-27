@@ -211,6 +211,10 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     final dbHelper = DatabaseHelper.instance;
     var type = widget.target.type;
     double value = widget.target.value;
+
+    String formattedTime =
+        "${elapsedTime.inHours.toString().padLeft(2, '0')}:${(elapsedTime.inMinutes % 60).toString().padLeft(2, '0')}:${(elapsedTime.inSeconds % 60).toString().padLeft(2, '0')}";
+
     Map<String, dynamic> sessionData = {
       'time_based': type == 'time' ? 1 : 0,
       'distance_based': type == 'distance' ? 1 : 0,
@@ -222,7 +226,7 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
       'result_distance': distance,
       'result_avg_speed': speed,
       'burned_calories': caloriesBurned,
-      'time_spend': elapsedTime.inHours,
+      'time_spend': formattedTime,
       'date': DateTime.now().toString().substring(0, 10),
     };
 
