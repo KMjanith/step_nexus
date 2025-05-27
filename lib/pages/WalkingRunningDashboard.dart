@@ -23,7 +23,7 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
   bool isSessionActive = false;
   double distance = 0.0; // in kilometers
   int startWindow = 0;
-  int endWindow = 200;
+  int endWindow = 100;
   int steps = 0;
   double caloriesBurned = 0.0;
   double weight = 70.0; // Default weight in kg
@@ -125,7 +125,7 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     _startCalorieCalculation();
 
     //loop to run every 4s
-    Timer.periodic(const Duration(seconds: 4), (Timer t) {
+    Timer.periodic(const Duration(seconds: 2), (Timer t) {
       if (!isSessionActive) {
         t.cancel();
         return;
@@ -139,7 +139,7 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
           steps += newSteps;
         });
         startWindow = endWindow;
-        endWindow += 200;
+        endWindow += 100;
       }
     });
   }
@@ -163,7 +163,7 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
       caloriesBurned = steps * 0.04; // example: 0.04 cal per step
       speed = 0.0;
       startWindow = 0;
-      endWindow = 200;
+      endWindow = 100;
     });
     positionStream?.cancel();
     calorieTimer?.cancel();
