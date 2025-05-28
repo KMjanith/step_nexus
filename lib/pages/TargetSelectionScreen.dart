@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:walking_nexus/components/BottomNavigationButton.dart';
 import 'package:walking_nexus/pages/CyclingDashboard.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
 import 'package:walking_nexus/pages/TravellingDashboard.dart';
@@ -105,140 +106,216 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
         elevation: 0,
       ),
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Select Target Type',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-                RadioListTile<String>(
-                  title: const Text('Target Time Duration (hours)'),
-                  value: 'time',
-                  groupValue: _selectedTargetType,
-                  activeColor: Colors.green,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedTargetType = value;
-                    });
-                  },
-                ),
-                if (_selectedTargetType == 'time') ...[
-                  TextFormField(
-                    controller: _timeController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Time (hours)',
-                      border: OutlineInputBorder(),
+                Form(
+                  key: _formKey,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.only(
+                        bottom: 80), // 👈 Add bottom padding
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Select Target Type',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 20),
+                        RadioListTile<String>(
+                          title: const Text('Target Time Duration (hours)'),
+                          value: 'time',
+                          groupValue: _selectedTargetType,
+                          activeColor: Colors.green,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedTargetType = value;
+                            });
+                          },
+                        ),
+                        if (_selectedTargetType == 'time') ...[
+                          TextFormField(
+                            controller: _timeController,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: 'Time (hours)',
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a time';
+                              }
+                              double? parsed = double.tryParse(value);
+                              if (parsed == null || parsed <= 0) {
+                                return 'Please enter a valid positive number';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                        RadioListTile<String>(
+                          title: const Text('Target Distance (km)'),
+                          value: 'distance',
+                          groupValue: _selectedTargetType,
+                          activeColor: Colors.green,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedTargetType = value;
+                            });
+                          },
+                        ),
+                        if (_selectedTargetType == 'distance') ...[
+                          TextFormField(
+                            controller: _distanceController,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: 'Distance (km)',
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a distance';
+                              }
+                              double? parsed = double.tryParse(value);
+                              if (parsed == null || parsed <= 0) {
+                                return 'Please enter a valid positive number';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                        if (isWalking) ...[
+                          RadioListTile<String>(
+                            title: const Text('Target Number of Steps'),
+                            value: 'steps',
+                            groupValue: _selectedTargetType,
+                            activeColor: Colors.green,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedTargetType = value;
+                              });
+                            },
+                          ),
+                          if (_selectedTargetType == 'steps') ...[
+                            TextFormField(
+                              controller: _stepsController,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                labelText: 'Steps',
+                                border: OutlineInputBorder(),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a step count';
+                                }
+                                double? parsed = double.tryParse(value);
+                                if (parsed == null || parsed <= 0) {
+                                  return 'Please enter a valid positive number';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                        ],
+                        const SizedBox(height: 30),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: _confirmTarget,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 30, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              minimumSize: const Size(double.infinity, 50),
+                            ),
+                            child: const Text('Confirm Target'),
+                          ),
+                        ),
+                      ],
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a time';
-                      }
-                      double? parsed = double.tryParse(value);
-                      if (parsed == null || parsed <= 0) {
-                        return 'Please enter a valid positive number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                ],
-                RadioListTile<String>(
-                  title: const Text('Target Distance (km)'),
-                  value: 'distance',
-                  groupValue: _selectedTargetType,
-                  activeColor: Colors.green,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedTargetType = value;
-                    });
-                  },
-                ),
-                if (_selectedTargetType == 'distance') ...[
-                  TextFormField(
-                    controller: _distanceController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Distance (km)',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a distance';
-                      }
-                      double? parsed = double.tryParse(value);
-                      if (parsed == null || parsed <= 0) {
-                        return 'Please enter a valid positive number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                ],
-                if (isWalking) ...[
-                  RadioListTile<String>(
-                    title: const Text('Target Number of Steps'),
-                    value: 'steps',
-                    groupValue: _selectedTargetType,
-                    activeColor: Colors.green,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedTargetType = value;
-                      });
-                    },
-                  ),
-                  if (_selectedTargetType == 'steps') ...[
-                    TextFormField(
-                      controller: _stepsController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Steps',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a step count';
-                        }
-                        double? parsed = double.tryParse(value);
-                        if (parsed == null || parsed <= 0) {
-                          return 'Please enter a valid positive number';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ],
-                const SizedBox(height: 30),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: _confirmTarget,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 12),
-                      //border raious
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      //width 100%
-                      minimumSize: Size(double.infinity, 50),
-                    ),
-                    child: const Text('Confirm Target'),
                   ),
                 ),
               ],
             ),
           ),
+          Positioned(
+            bottom: 10,
+            left: 0,
+            right: 0,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              height: 60,
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 0, 80, 20),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(100)
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Bottomnavigationbutton(
+                      onPressed: () =>
+                          _navigateToTargetSelection(context, Activity.walking,false),
+                      icon: Icons.nordic_walking,
+                      iconDescription: "Walk",
+                    ),
+                    Bottomnavigationbutton(
+                      onPressed: () =>
+                          _navigateToTargetSelection(context, Activity.cycling,false),
+                      icon: Icons.pedal_bike,
+                      iconDescription: "Cycle",
+                    ),
+                    Bottomnavigationbutton(
+                      onPressed: () => _navigateToTargetSelection(
+                          context, Activity.travelling,false),
+                      icon: Icons.travel_explore,
+                      iconDescription: "Travel",
+                    ),
+                    Bottomnavigationbutton(
+                      onPressed: () => _navigateToTargetSelection(
+                          context, Activity.travelling,true),
+                      icon: Icons.home,
+                      iconDescription: "home",
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _navigateToTargetSelection(BuildContext context, Activity activity, bool home) {
+    Navigator.pop(context);
+    if (home) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(),
         ),
+      );
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TargetSelectionScreen(activity: activity),
       ),
     );
   }

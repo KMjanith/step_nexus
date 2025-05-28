@@ -16,7 +16,6 @@ class Walkingpastdetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(pastData['target_time']);
     bool targetAchived = (pastData['step_based'] == 1 &&
             (pastData['target_steps'] >= pastData['result_steps'])) ||
         (pastData['distance_based'] == 1 &&

@@ -7,12 +7,21 @@ class Cyclingorwalkingpastdetails extends StatelessWidget {
   Cyclingorwalkingpastdetails(
       {required this.pastData, required this.onDelete, super.key});
 
+  Duration _parseDuration(String timeString) {
+    List<String> parts = timeString.split(':');
+    int hours = int.parse(parts[0]);
+    int minutes = int.parse(parts[1]);
+    int seconds = int.parse(parts[2]);
+    return Duration(hours: hours, minutes: minutes, seconds: seconds);
+  }
+
   @override
   Widget build(BuildContext context) {
     bool targetAchived = (pastData['distance_based'] == 1 &&
             (pastData['target_distance'] >= pastData['result_distance'])) ||
         (pastData['time_based'] == 1 &&
-            (pastData['target_time'] >= pastData['time_spend']));
+            (pastData['target_time'] >=
+                _parseDuration(pastData['time_spend']).inHours));
 
     String TARGET_ACHIEVED = pastData['distance_based'] == 1
         ? "Distance target ${pastData['target_distance']} km achieved!"
@@ -110,7 +119,7 @@ class Cyclingorwalkingpastdetails extends StatelessWidget {
                       Icon(Icons.timelapse,
                           color: const Color.fromARGB(255, 206, 65, 0)),
                       "${pastData['time_spend']}",
-                      "hrs."),
+                      "hr:min:sec"),
                   _detailTab(
                       Icon(Icons.route,
                           color: const Color.fromARGB(255, 0, 13, 22)),

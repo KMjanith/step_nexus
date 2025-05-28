@@ -49,7 +49,8 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
     print(widget.target.type);
     switch (widget.target.type) {
       case 'distance':
-        latestSession = await db.getDistanceBasedCyclingOrTravellingSessions('');
+        latestSession =
+            await db.getDistanceBasedCyclingOrTravellingSessions('');
         break;
       case 'time':
         latestSession = await db.getTimeBsedCyclingOrTravellingSessions('');
@@ -171,6 +172,9 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
     final dbHelper = DatabaseHelper.instance;
     var type = widget.target.type;
     double value = widget.target.value;
+    String formattedTime =
+        "${elapsedTime.inHours.toString().padLeft(2, '0')}:${(elapsedTime.inMinutes % 60).toString().padLeft(2, '0')}:${(elapsedTime.inSeconds % 60).toString().padLeft(2, '0')}";
+
     Map<String, dynamic> sessionData = {
       'time_based': type == 'time' ? 1 : 0,
       'distance_based': type == 'distance' ? 1 : 0,
@@ -178,11 +182,11 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
       'target_time': type == 'time' ? value : null,
       'result_distance': distance,
       'result_avg_speed': speed,
-      'time_spend': elapsedTime.inHours.toDouble(),
+      'time_spend': formattedTime,
       'date': DateTime.now().toString().substring(0, 10),
     };
 
-    await dbHelper.insertCyclingOrTravellingSession(sessionData,'');
+    await dbHelper.insertCyclingOrTravellingSession(sessionData, '');
     print('Session data saved to database');
     _loadPastSessionData();
   }

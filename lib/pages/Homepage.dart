@@ -137,17 +137,15 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Positioned(
-              bottom: 0,
+              bottom: 10,
               left: 0,
               right: 0,
               child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
                 height: 60,
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 0, 151, 126),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 0, 80, 20),
+                  borderRadius: BorderRadius.all(Radius.circular(100)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),

@@ -22,7 +22,7 @@ class Bottomnavigationbutton extends StatelessWidget {
             iconDescription,
             style: TextStyle(
               fontSize: 10,
-              color: const Color.fromARGB(255, 219, 219, 219),
+              color: const Color.fromARGB(255, 255, 255, 255),
             ),
           ),
         ],
