@@ -5,6 +5,7 @@ import 'package:walking_nexus/components/CyclingOrWalkingPastDetails.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
 import 'dart:async';
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
+import 'package:walking_nexus/services/NotificationHelper.dart';
 import 'package:walking_nexus/sources/database_helper.dart';
 
 class CyclingDashboard extends StatefulWidget {
@@ -52,10 +53,12 @@ class _CyclingDashboardState extends State<CyclingDashboard> {
     print(widget.target.type);
     switch (widget.target.type) {
       case 'distance':
-        latestSession = await db.getDistanceBasedCyclingOrTravellingSessions('cycling');
+        latestSession =
+            await db.getDistanceBasedCyclingOrTravellingSessions('cycling');
         break;
       case 'time':
-        latestSession = await db.getTimeBsedCyclingOrTravellingSessions('cycling');
+        latestSession =
+            await db.getTimeBsedCyclingOrTravellingSessions('cycling');
         break;
     }
 
@@ -91,6 +94,33 @@ class _CyclingDashboardState extends State<CyclingDashboard> {
 
     _startTrackingSpeed();
     _startCalorieCalculation();
+
+    // Start idling detection
+    _startIdlingDetection();
+  }
+
+  void _startIdlingDetection() {
+    double lastDistance = distance;
+
+    Timer.periodic(const Duration(seconds: 60), (Timer t) {
+      if (!isSessionActive) {
+        t.cancel();
+        return;
+      }
+
+      bool isIdling = (speed == 0.0) || (distance == lastDistance);
+
+      if (isIdling) {
+        NotificationHelper.showNotification(
+          title: 'Idling Detected',
+          body: 'You have been idling for a minute. Keep moving!',
+        );
+      }
+
+      // Update last values
+
+      lastDistance = distance;
+    });
   }
 
   void stopSession() {

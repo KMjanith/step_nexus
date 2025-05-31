@@ -1,6 +1,7 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
+import 'package:walking_nexus/services/NotificationHelper.dart';
 import 'package:walking_nexus/sources/database_helper.dart';
 
 void main() async {
@@ -9,6 +10,12 @@ void main() async {
   // insertDummySessions();
   // insertDummyCyclingSessions();
   // insertDummyTravellingSessions();
+  await NotificationHelper.initialize();
+  // Request notification permission
+  bool permissionGranted = await NotificationHelper.requestPermission();
+  if (!permissionGranted) {
+    print('Notification permission not granted.');
+  }
   runApp(MyApp());
 }
 
@@ -148,11 +155,10 @@ class MyApp extends StatelessWidget {
               const Text(
                 'STEP NEXUS',
                 style: TextStyle(
-                  fontSize: 30,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Poppins'
-                ),
+                    fontSize: 30,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins'),
               ),
             ],
           ),

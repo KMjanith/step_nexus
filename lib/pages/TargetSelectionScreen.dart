@@ -253,13 +253,11 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
             left: 0,
             right: 0,
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
+              margin: const EdgeInsets.symmetric(horizontal: 10),
               height: 60,
               decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 0, 80, 20),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(100)
-                ),
+                color: Color.fromARGB(255, 0, 104, 122),
+                borderRadius: BorderRadius.all(Radius.circular(15)),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -268,26 +266,26 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Bottomnavigationbutton(
-                      onPressed: () =>
-                          _navigateToTargetSelection(context, Activity.walking,false),
+                      onPressed: () => _navigateToTargetSelection(
+                          context, Activity.walking, false),
                       icon: Icons.nordic_walking,
                       iconDescription: "Walk",
                     ),
                     Bottomnavigationbutton(
-                      onPressed: () =>
-                          _navigateToTargetSelection(context, Activity.cycling,false),
+                      onPressed: () => _navigateToTargetSelection(
+                          context, Activity.cycling, false),
                       icon: Icons.pedal_bike,
                       iconDescription: "Cycle",
                     ),
                     Bottomnavigationbutton(
                       onPressed: () => _navigateToTargetSelection(
-                          context, Activity.travelling,false),
+                          context, Activity.travelling, false),
                       icon: Icons.travel_explore,
                       iconDescription: "Travel",
                     ),
                     Bottomnavigationbutton(
                       onPressed: () => _navigateToTargetSelection(
-                          context, Activity.travelling,true),
+                          context, Activity.travelling, true),
                       icon: Icons.home,
                       iconDescription: "home",
                     ),
@@ -301,7 +299,8 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
     );
   }
 
-  void _navigateToTargetSelection(BuildContext context, Activity activity, bool home) {
+  void _navigateToTargetSelection(
+      BuildContext context, Activity activity, bool home) {
     Navigator.pop(context);
     if (home) {
       Navigator.pushReplacement(
