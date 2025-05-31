@@ -58,8 +58,6 @@ class _HomePageState extends State<HomePage> {
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Roboto'), // Example of a good font
                 ),
-                Icon(Icons.health_and_safety_outlined,
-                    color: const Color.fromARGB(255, 175, 88, 88), size: 35),
               ],
             ),
           ),
@@ -141,11 +139,11 @@ class _HomePageState extends State<HomePage> {
               left: 0,
               right: 0,
               child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 10),
                 height: 60,
                 decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 0, 80, 20),
-                  borderRadius: BorderRadius.all(Radius.circular(100)),
+                  color: Color.fromARGB(255, 0, 104, 122),
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
