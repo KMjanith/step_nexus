@@ -47,6 +47,7 @@ dependencies:
   flutter_native_splash: ^2.4.6
   flutter_local_notifications: ^17.2.2
   permission_handler: ^11.0.0
+  flutter_launcher_icons: ^0.14.0
 
 dev_dependencies:
   flutter_test:
@@ -99,3 +100,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_launcher_icons:
+  android: "launcher_icon" # Use true to keep default name or specify a custom name
+  ios: true
+  image_path: "images/app-icon.png" # Path to your icon image
+  adaptive_icon_background: "#FFFFFF" # Optional: Background color for Android adaptive icons
+  remove_alpha_ios: true # Optional: Remove alpha channel for iOS
