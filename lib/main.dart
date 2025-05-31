@@ -11,6 +11,11 @@ void main() async {
   // insertDummyCyclingSessions();
   // insertDummyTravellingSessions();
   await NotificationHelper.initialize();
+  // Request notification permission
+  bool permissionGranted = await NotificationHelper.requestPermission();
+  if (!permissionGranted) {
+    print('Notification permission not granted.');
+  }
   runApp(MyApp());
 }
 

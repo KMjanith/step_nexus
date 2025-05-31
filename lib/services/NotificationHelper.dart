@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class NotificationHelper {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -12,6 +13,11 @@ class NotificationHelper {
         InitializationSettings(android: initializationSettingsAndroid);
 
     await _notificationsPlugin.initialize(initializationSettings);
+  }
+
+  static Future<bool> requestPermission() async {
+    PermissionStatus status = await Permission.notification.request();
+    return status.isGranted;
   }
 
   static Future<void> showNotification({
