@@ -1,48 +1,56 @@
+import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:walking_nexus/pages/Homepage.dart';
+import 'package:walking_nexus/services/NotificationHelper.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:walking_nexus/services/NotificationHelper.dart';
-import 'package:walking_nexus/pages/Homepage.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 
-@pragma('vm:entry-point')
-void alarmCallback() {
-  NotificationHelper.showNotification(
-    title: "Walk Reminder",
-    body: "Your scheduled walk is about to start!",
-  );
-}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  //await DatabaseHelper.instance.deleteDatabaseFile(); // Only for development
+  tz.initializeTimeZones(); // Add this!
+   tz.setLocalLocation(tz.getLocation('Asia/Kolkata')); // Change to your timezone if needed
 
-  // 1) Initialize timezone data
-  tz.initializeTimeZones();
-  String currentTz = tz.local.name;
-  try {
-    currentTz = await FlutterTimezone.getLocalTimezone();
-  } catch (_) {
-    // fallback if plugin fails
-  }
-  tz.setLocalLocation(tz.getLocation(currentTz));
-
-  // 2) Initialize NotificationHelper (creates channels, etc.)
   await NotificationHelper.initialize();
-
-  // 3) Initialize the Android Alarm Manager
-  await AndroidAlarmManager.initialize();
-
-  runApp(const MyApp());
+  // Request notification permission
+  bool permissionGranted = await NotificationHelper.requestPermission();
+  if (!permissionGranted) {
+    print('Notification permission not granted.');
+  }
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: AnimatedSplashScreen(
+        splashIconSize: 4000.0,
+        backgroundColor: Colors.black,
+        nextScreen: HomePage(),
+        splash: Center(
+          child: Column(
+            children: [
+              SizedBox(
+                height: 300,
+              ),
+              Image.asset(
+                'images/startup_anime.gif',
+              ),
+              const Text(
+                'STEP NEXUS',
+                style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins'),
+              ),
+            ],
+          ),
+        ),
+      ), // Load HomePage
     );
   }
 }

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:walking_nexus/components/BottomNavigationButton.dart';
-import 'package:walking_nexus/main.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
 import 'package:walking_nexus/services/NotificationHelper.dart';
@@ -50,7 +48,17 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
             lastDay: DateTime.now().add(const Duration(days: 365)),
             focusedDay: _focusedDay,
             calendarFormat: CalendarFormat.month,
-            headerStyle: const HeaderStyle(formatButtonVisible: false),
+
+            // ### 1) Hide the format‐toggle button:
+            headerStyle: const HeaderStyle(
+              formatButtonVisible: false,
+            ),
+
+            // ### 2) (Optional) Only allow month format
+            availableCalendarFormats: const {
+              CalendarFormat.month: 'Month',
+            },
+
             startingDayOfWeek: StartingDayOfWeek.monday,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
             onDaySelected: (selectedDay, focusedDay) {
@@ -69,7 +77,6 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
               },
             ),
           ),
-
           // bottom navigation bar
           Positioned(
             bottom: 10,
@@ -88,26 +95,26 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Bottomnavigationbutton(
-                      onPressed: () =>
-                          _navigateToTargetSelection(context, Activity.walking, false),
+                      onPressed: () => _navigateToTargetSelection(
+                          context, Activity.walking, false),
                       icon: Icons.nordic_walking,
                       iconDescription: "Walk",
                     ),
                     Bottomnavigationbutton(
-                      onPressed: () =>
-                          _navigateToTargetSelection(context, Activity.cycling, false),
+                      onPressed: () => _navigateToTargetSelection(
+                          context, Activity.cycling, false),
                       icon: Icons.pedal_bike,
                       iconDescription: "Cycle",
                     ),
                     Bottomnavigationbutton(
-                      onPressed: () =>
-                          _navigateToTargetSelection(context, Activity.travelling, false),
+                      onPressed: () => _navigateToTargetSelection(
+                          context, Activity.travelling, false),
                       icon: Icons.travel_explore,
                       iconDescription: "Travel",
                     ),
                     Bottomnavigationbutton(
-                      onPressed: () =>
-                          _navigateToTargetSelection(context, Activity.travelling, true),
+                      onPressed: () => _navigateToTargetSelection(
+                          context, Activity.travelling, true),
                       icon: Icons.home,
                       iconDescription: "home",
                     ),
@@ -285,7 +292,7 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
                   final newId =
                       await DatabaseHelper.instance.insertScheduledWalk(data);
 
-                  // 2) Calculate "10 minutes before" the chosen startTime
+                  // 2) Calculate "10 minutes before" (or adjust to 2 min if you prefer)
                   final scheduledDateTime = DateTime(
                     date.year,
                     date.month,
@@ -296,13 +303,15 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
                   final fireDate =
                       scheduledDateTime.subtract(const Duration(minutes: 10));
 
-                  // 3) Schedule the alarm for that “fireDate”
-                  await AndroidAlarmManager.oneShotAt(
-                    fireDate,
-                    newId,         // unique alarm ID
-                    alarmCallback, // top-level function (marked with @pragma)
-                    exact: true,
-                    wakeup: true,
+                  // 3) Schedule the notification
+                  //    Using hour/minute of fireDate on the same day
+                  await NotificationHelper.scheduleNotification(
+                    id: newId,
+                    title: "Upcoming Walk Goal",
+                    body:
+                        "Your ${goalType == "time" ? "${goalValue.toInt()} min" : goalType == "distance" ? "${goalValue} km" : "${goalValue.toInt()} steps"} walk starts soon!",
+                    hour: fireDate.hour,
+                    minute: fireDate.minute,
                   );
 
                   // 4) Refresh UI and close dialog
@@ -336,7 +345,8 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
     if (session != null) {
       bgColor = Colors.green[200];
     } else if (isSelected) {
-      bgColor = const Color.fromARGB(255, 139, 195, 241);
+      bgColor = const Color.fromARGB(
+          255, 139, 195, 241); // default blue for selection
     }
 
     return Container(
