@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:walking_nexus/components/BottomNavigationButton.dart';
+import 'package:walking_nexus/main.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
+import 'package:walking_nexus/services/NotificationHelper.dart';
 import 'package:walking_nexus/sources/database_helper.dart';
 
 class CalendarSchedulePage extends StatefulWidget {
   const CalendarSchedulePage({super.key});
-
   @override
   State<CalendarSchedulePage> createState() => _CalendarSchedulePageState();
 }
@@ -29,7 +31,7 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
     setState(() {
       scheduledDays.clear();
       for (var session in sessions) {
-        DateTime date = DateTime.parse(session['date']);
+        final date = DateTime.parse(session['date']);
         scheduledDays[_dayOnly(date)] = session;
       }
     });
@@ -48,6 +50,7 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
             lastDay: DateTime.now().add(const Duration(days: 365)),
             focusedDay: _focusedDay,
             calendarFormat: CalendarFormat.month,
+            headerStyle: const HeaderStyle(formatButtonVisible: false),
             startingDayOfWeek: StartingDayOfWeek.monday,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
             onDaySelected: (selectedDay, focusedDay) {
@@ -58,18 +61,16 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
               _showScheduleDialog(selectedDay);
             },
             calendarBuilders: CalendarBuilders(
-              defaultBuilder: (context, day, _) {
-                return _buildDayCell(day, isSelected: false);
-              },
+              defaultBuilder: (context, day, _) =>
+                  _buildDayCell(day, isSelected: false),
               selectedBuilder: (context, day, _) {
                 final isScheduled = scheduledDays.containsKey(_dayOnly(day));
-                // If it’s a scheduled day, draw it like defaultBuilder to keep it green
                 return _buildDayCell(day, isSelected: !isScheduled);
               },
             ),
           ),
 
-          //bottom navbar
+          // bottom navigation bar
           Positioned(
             bottom: 10,
             left: 0,
@@ -85,29 +86,28 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Bottomnavigationbutton(
-                      onPressed: () => _navigateToTargetSelection(
-                          context, Activity.walking, false),
+                      onPressed: () =>
+                          _navigateToTargetSelection(context, Activity.walking, false),
                       icon: Icons.nordic_walking,
                       iconDescription: "Walk",
                     ),
                     Bottomnavigationbutton(
-                      onPressed: () => _navigateToTargetSelection(
-                          context, Activity.cycling, false),
+                      onPressed: () =>
+                          _navigateToTargetSelection(context, Activity.cycling, false),
                       icon: Icons.pedal_bike,
                       iconDescription: "Cycle",
                     ),
                     Bottomnavigationbutton(
-                      onPressed: () => _navigateToTargetSelection(
-                          context, Activity.travelling, false),
+                      onPressed: () =>
+                          _navigateToTargetSelection(context, Activity.travelling, false),
                       icon: Icons.travel_explore,
                       iconDescription: "Travel",
                     ),
                     Bottomnavigationbutton(
-                      onPressed: () => _navigateToTargetSelection(
-                          context, Activity.travelling, true),
+                      onPressed: () =>
+                          _navigateToTargetSelection(context, Activity.travelling, true),
                       icon: Icons.home,
                       iconDescription: "home",
                     ),
@@ -127,34 +127,31 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
     if (home) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => HomePage(),
-        ),
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
       return;
     }
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => TargetSelectionScreen(activity: activity),
-      ),
+          builder: (context) => TargetSelectionScreen(activity: activity)),
     );
   }
 
   void _showScheduleDialog(DateTime date) {
     String? goalType;
-    final TextEditingController valueController = TextEditingController();
+    final valueController = TextEditingController();
     TimeOfDay? startTime;
 
     final existing = scheduledDays[_dayOnly(date)];
     if (existing != null) {
       goalType = existing['goal_type'];
       valueController.text = existing['goal_value'].toString();
-      final timeParts = (existing['start_time'] as String).split(':');
-      if (timeParts.length == 2) {
+      final parts = (existing['start_time'] as String).split(':');
+      if (parts.length == 2) {
         startTime = TimeOfDay(
-          hour: int.parse(timeParts[0]),
-          minute: int.parse(timeParts[1]),
+          hour: int.parse(parts[0]),
+          minute: int.parse(parts[1]),
         );
       }
     }
@@ -163,15 +160,17 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => AlertDialog(
-          title:
-              Text("Set schedule for ${DateFormat('EEE, MMM d').format(date)}"),
+          title: Text(
+            "Set schedule for ${DateFormat('EEE, MMM d').format(date)}",
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
                 value: goalType,
                 hint: const Text("Select Goal Type"),
@@ -185,9 +184,7 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
                     .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                     .toList(),
               ),
-              SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               if (goalType != null)
                 TextFormField(
                   controller: valueController,
@@ -196,7 +193,8 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
                       : const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: goalType == "time"
                         ? "Duration (minutes)"
                         : goalType == "distance"
@@ -207,24 +205,25 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
               const SizedBox(height: 10),
               Container(
                 decoration: BoxDecoration(
-                    border: Border.all(width: 1, color: const Color.fromARGB(255, 109, 109, 109)),
-                    borderRadius: BorderRadius.circular(10)),
+                  border: Border.all(
+                    width: 1,
+                    color: const Color.fromARGB(255, 109, 109, 109),
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Text(startTime?.format(context) ?? "Time Not set",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                        ],
+                      Text(
+                        startTime?.format(context) ?? "Time Not set",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(width: 8),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
-                              const Color.fromARGB(255, 9, 148, 141),
+                              const Color.fromARGB(255, 0, 104, 122),
                         ),
                         onPressed: () async {
                           final picked = await showTimePicker(
@@ -237,8 +236,10 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
                             });
                           }
                         },
-                        child: const Text("Pick",
-                            style: TextStyle(color: Colors.white)),
+                        child: const Text(
+                          "Pick",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ],
                   ),
@@ -248,48 +249,16 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
           ),
           actions: [
             TextButton(
-              style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(
-                      const Color.fromARGB(255, 178, 220, 255))),
+              style: TextButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 178, 220, 255),
+              ),
               onPressed: () => Navigator.pop(context),
               child: const Text("Cancel"),
             ),
-            if (existing != null)
-              TextButton(
-                style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(
-                      const Color.fromARGB(255, 255, 204, 201)),
-                ),
-                onPressed: () async {
-                  final confirm = await showDialog<bool>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text("Delete Schedule"),
-                      content: const Text(
-                          "Are you sure you want to delete this schedule?"),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, false),
-                          child: const Text("No"),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, true),
-                          child: const Text("Yes"),
-                        ),
-                      ],
-                    ),
-                  );
-                  if (confirm == true) {
-                    await DatabaseHelper.instance
-                        .deleteScheduledWalk(existing['id']);
-                    await _loadScheduledSessions();
-                    Navigator.pop(context); // close main dialog
-                  }
-                },
-                child:
-                    const Text("Delete", style: TextStyle(color: Colors.red)),
-              ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 0, 104, 122),
+              ),
               onPressed: () async {
                 if (goalType != null &&
                     valueController.text.isNotEmpty &&
@@ -298,7 +267,7 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
                   if (goalValue == null) return;
 
                   final timeString =
-                      "${startTime!.hour.toString().padLeft(2, '0')}:${startTime!.minute.toString().padLeft(2, '0')}";
+                      "${startTime?.hour.toString().padLeft(2, '0')}:${startTime?.minute.toString().padLeft(2, '0')}";
 
                   final data = {
                     'date': DateFormat('yyyy-MM-dd').format(date),
@@ -312,14 +281,35 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
                         .deleteScheduledWalk(existing['id']);
                   }
 
-                  await DatabaseHelper.instance.insertScheduledWalk(data);
+                  // 1) Save to database
+                  final newId =
+                      await DatabaseHelper.instance.insertScheduledWalk(data);
+
+                  // 2) Calculate "10 minutes before" the chosen startTime
+                  final scheduledDateTime = DateTime(
+                    date.year,
+                    date.month,
+                    date.day,
+                    startTime!.hour,
+                    startTime!.minute,
+                  );
+                  final fireDate =
+                      scheduledDateTime.subtract(const Duration(minutes: 10));
+
+                  // 3) Schedule the alarm for that “fireDate”
+                  await AndroidAlarmManager.oneShotAt(
+                    fireDate,
+                    newId,         // unique alarm ID
+                    alarmCallback, // top-level function (marked with @pragma)
+                    exact: true,
+                    wakeup: true,
+                  );
+
+                  // 4) Refresh UI and close dialog
                   await _loadScheduledSessions();
                   Navigator.pop(context);
                 }
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 9, 148, 141),
-              ),
               child: const Text("Save", style: TextStyle(color: Colors.white)),
             ),
           ],
@@ -346,12 +336,12 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
     if (session != null) {
       bgColor = Colors.green[200];
     } else if (isSelected) {
-      bgColor = const Color.fromARGB(255, 139, 195, 241); // default blue for non-scheduled days
+      bgColor = const Color.fromARGB(255, 139, 195, 241);
     }
 
     return Container(
       margin: const EdgeInsets.all(4),
-      padding: const EdgeInsets.only(right: 10, top:4, bottom: 4, left:10),
+      padding: const EdgeInsets.only(right: 10, top: 4, bottom: 4, left: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: bgColor,
@@ -361,9 +351,7 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
         children: [
           Text('${day.day}',
               style: const TextStyle(fontWeight: FontWeight.bold)),
-          if (label != null)
-            Text(label,
-                style: const TextStyle(fontSize: 10, color: Colors.black87)),
+          if (label != null) Text(label, style: const TextStyle(fontSize: 10)),
         ],
       ),
     );

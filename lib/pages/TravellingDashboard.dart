@@ -5,7 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:walking_nexus/components/CyclingOrWalkingPastDetails.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
-import 'package:walking_nexus/services/NotificationHelper.dart';
+// import 'package:walking_nexus/services/NotificationHelper.dart';
 import 'package:walking_nexus/sources/database_helper.dart';
 
 class TravellingDashboard extends StatefulWidget {
@@ -89,29 +89,29 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
     _startTrackingSpeed();
   }
 
-  void _startIdlingDetection() {
-    double lastDistance = distance;
+  // void _startIdlingDetection() {
+  //   double lastDistance = distance;
 
-    Timer.periodic(const Duration(seconds: 60), (Timer t) {
-      if (!isSessionActive) {
-        t.cancel();
-        return;
-      }
+  //   Timer.periodic(const Duration(seconds: 60), (Timer t) {
+  //     if (!isSessionActive) {
+  //       t.cancel();
+  //       return;
+  //     }
 
-      bool isIdling = (speed == 0.0) || (distance == lastDistance);
+  //     bool isIdling = (speed == 0.0) || (distance == lastDistance);
 
-      if (isIdling) {
-        NotificationHelper.showNotification(
-          title: 'Idling Detected',
-          body: 'You have been idling for a minute. Keep moving!',
-        );
-      }
+  //     if (isIdling) {
+  //       NotificationHelper.showNotification(
+  //         title: 'Idling Detected',
+  //         body: 'You have been idling for a minute. Keep moving!',
+  //       );
+  //     }
 
-      // Update last values
+  //     // Update last values
 
-      lastDistance = distance;
-    });
-  }
+  //     lastDistance = distance;
+  //   });
+  // }
 
   void stopSession() {
     setState(() {

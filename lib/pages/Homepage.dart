@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+// import 'package:timezone/timezone.dart' as tz;
 import 'package:walking_nexus/components/BottomNavigationButton.dart';
 import 'package:walking_nexus/pages/CalendarSchedulePage.dart';
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
 import 'package:walking_nexus/components/DashboardButton.dart';
+// import 'package:walking_nexus/services/NotificationHelper.dart';
 
 enum Activity { walking, cycling, travelling }
 
@@ -114,26 +116,37 @@ class _HomePageState extends State<HomePage> {
                                 child: Container(
                                     width: 100,
                                     height: 50,
-                                    decoration:
-                                        BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(10)),
-                                    child: Center(child: Text("Cancel",style: TextStyle(color: Colors.white),))),
+                                    decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: Center(
+                                        child: Text(
+                                      "Cancel",
+                                      style: TextStyle(color: Colors.white),
+                                    ))),
                                 onPressed: () => Navigator.of(context).pop(),
                               ),
                               TextButton(
                                 child: Container(
                                     width: 100,
                                     height: 50,
-                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
                                         color: const Color.fromARGB(
                                             255, 30, 148, 0)),
-                                    child: Center(child: Text("Next",style: TextStyle(color: Colors.white)))),
+                                    child: Center(
+                                        child: Text("Next",
+                                            style: TextStyle(
+                                                color: Colors.white)))),
                                 onPressed: () {
                                   Navigator.of(context)
                                       .pop(); // Close the dialog
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => CalendarSchedulePage()),
+                                        builder: (context) =>
+                                            CalendarSchedulePage()),
                                   );
                                 },
                               ),
@@ -222,6 +235,69 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+
+          // Positioned(
+          //   top: 50,
+          //   child: ElevatedButton.icon(
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: Colors.green,
+          //       foregroundColor: Colors.white,
+          //       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          //       shape: RoundedRectangleBorder(
+          //           borderRadius: BorderRadius.circular(10)),
+          //     ),
+          //     icon: Icon(Icons.notifications_active),
+          //     label: Text("Trigger Notification"),
+          //     onPressed: () async {
+          //       bool granted = await NotificationHelper.requestPermission();
+          //       if (granted) {
+          //         await NotificationHelper.showNotification(
+          //           title: "Test Notification",
+          //           body:
+          //               "This is a test notification triggered by button click.",
+          //         );
+          //       } else {
+          //         ScaffoldMessenger.of(context).showSnackBar(
+          //           SnackBar(
+          //               content: Text("Notification permission not granted")),
+          //         );
+          //       }
+          //     },
+          //   ),
+          // ),
+
+          //           Positioned(
+          //   top: 100,
+          //   child: ElevatedButton.icon(
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: Colors.green,
+          //       foregroundColor: Colors.white,
+          //       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          //       shape: RoundedRectangleBorder(
+          //           borderRadius: BorderRadius.circular(10)),
+          //     ),
+          //     icon: Icon(Icons.notifications_active),
+          //     label: Text("Trigger Notification"),
+          //     onPressed: () async {
+          //       bool granted = await NotificationHelper.requestPermission();
+          //       if (granted) {
+          //         await NotificationHelper.scheduleNotification(
+          //           id: 1,
+          //           title: "asas",
+          //           body: "This is a scheduled notification.",
+          //           hour: 19,
+          //           minute: 15,
+          //         );
+          //       } else {
+          //         ScaffoldMessenger.of(context).showSnackBar(
+          //           SnackBar(
+          //               content: Text("Notification permission not granted")),
+          //         );
+          //       }
+          //     },
+          //   ),
+          // ),
+
           Positioned(
               bottom: 10,
               left: 0,
