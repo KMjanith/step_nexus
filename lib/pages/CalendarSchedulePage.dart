@@ -255,6 +255,21 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
             ],
           ),
           actions: [
+            if (existing != null)
+              TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 255, 190, 190),
+                ),
+                onPressed: () async {
+                  await DatabaseHelper.instance
+                      .deleteScheduledWalk(existing['id']);
+
+                  await _loadScheduledSessions();
+                  Navigator.pop(context); // Close dialog
+                },
+                child:
+                    const Text("Delete", style: TextStyle(color: Colors.red)),
+              ),
             TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 178, 220, 255),
@@ -288,11 +303,9 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
                         .deleteScheduledWalk(existing['id']);
                   }
 
-                  // 1) Save to database
                   final newId =
                       await DatabaseHelper.instance.insertScheduledWalk(data);
 
-                  // 2) Calculate "10 minutes before" (or adjust to 2 min if you prefer)
                   final scheduledDateTime = DateTime(
                     date.year,
                     date.month,
@@ -303,8 +316,6 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
                   final fireDate =
                       scheduledDateTime.subtract(const Duration(minutes: 10));
 
-                  // 3) Schedule the notification
-                  //    Using hour/minute of fireDate on the same day
                   await NotificationHelper.scheduleNotification(
                     id: newId,
                     title: "Upcoming Walk Goal",
@@ -314,7 +325,6 @@ class _CalendarSchedulePageState extends State<CalendarSchedulePage> {
                     minute: fireDate.minute,
                   );
 
-                  // 4) Refresh UI and close dialog
                   await _loadScheduledSessions();
                   Navigator.pop(context);
                 }
