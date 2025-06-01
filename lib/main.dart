@@ -6,10 +6,6 @@ import 'package:walking_nexus/services/NotificationHelper.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 
-/// ← This annotation is required so that android_alarm_manager_plus can
-///     invoke the callback from native code.
-///
-/// See: https://github.com/dart-lang/sdk/blob/master/runtime/docs/compiler/aot/entry_point_pragma.md
 @pragma('vm:entry-point')
 void alarmCallback() {
   NotificationHelper.showNotification(
