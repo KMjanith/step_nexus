@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:walking_nexus/components/BottomNavigationButton.dart';
+import 'package:walking_nexus/pages/CalendarSchedulePage.dart';
 import 'package:walking_nexus/pages/CyclingDashboard.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
 import 'package:walking_nexus/pages/TravellingDashboard.dart';
@@ -248,6 +249,8 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
               ],
             ),
           ),
+
+          //bottom navbar
           Positioned(
             bottom: 10,
             left: 0,
@@ -267,27 +270,33 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
                   children: [
                     Bottomnavigationbutton(
                       onPressed: () => _navigateToTargetSelection(
-                          context, Activity.walking, false),
+                          context, Activity.walking, false, false),
                       icon: Icons.nordic_walking,
                       iconDescription: "Walk",
                     ),
                     Bottomnavigationbutton(
                       onPressed: () => _navigateToTargetSelection(
-                          context, Activity.cycling, false),
+                          context, Activity.cycling, false, false),
                       icon: Icons.pedal_bike,
                       iconDescription: "Cycle",
                     ),
                     Bottomnavigationbutton(
                       onPressed: () => _navigateToTargetSelection(
-                          context, Activity.travelling, false),
+                          context, Activity.travelling, false, false),
                       icon: Icons.travel_explore,
                       iconDescription: "Travel",
                     ),
                     Bottomnavigationbutton(
                       onPressed: () => _navigateToTargetSelection(
-                          context, Activity.travelling, true),
+                          context, Activity.travelling, true, false),
                       icon: Icons.home,
                       iconDescription: "home",
+                    ),
+                    Bottomnavigationbutton(
+                      onPressed: () => _navigateToTargetSelection(
+                          context, Activity.travelling, false, true),
+                      icon: Icons.schedule_rounded,
+                      iconDescription: "schedule",
                     ),
                   ],
                 ),
@@ -300,13 +309,23 @@ class _TargetSelectionScreenState extends State<TargetSelectionScreen> {
   }
 
   void _navigateToTargetSelection(
-      BuildContext context, Activity activity, bool home) {
+      BuildContext context, Activity activity, bool home, bool schedule) {
     Navigator.pop(context);
     if (home) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => HomePage(),
+        ),
+      );
+      return;
+    }
+
+    if (schedule) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CalendarSchedulePage(),
         ),
       );
       return;

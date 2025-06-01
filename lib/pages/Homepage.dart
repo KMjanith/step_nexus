@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:walking_nexus/components/BottomNavigationButton.dart';
+import 'package:walking_nexus/pages/CalendarSchedulePage.dart';
 import 'package:walking_nexus/pages/TargetSelectionScreen.dart';
 import 'package:walking_nexus/components/DashboardButton.dart';
 
@@ -98,8 +99,95 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 10),
 
+                  Center(
+                    child: TextButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text("Create Schedule"),
+                            content: Text(
+                                "Do you want to create your own schedule now?"),
+                            actions: [
+                              TextButton(
+                                child: Container(
+                                    width: 100,
+                                    height: 50,
+                                    decoration:
+                                        BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(10)),
+                                    child: Center(child: Text("Cancel",style: TextStyle(color: Colors.white),))),
+                                onPressed: () => Navigator.of(context).pop(),
+                              ),
+                              TextButton(
+                                child: Container(
+                                    width: 100,
+                                    height: 50,
+                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),
+                                        color: const Color.fromARGB(
+                                            255, 30, 148, 0)),
+                                    child: Center(child: Text("Next",style: TextStyle(color: Colors.white)))),
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pop(); // Close the dialog
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => CalendarSchedulePage()),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 300,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color.fromARGB(255, 37, 204, 190),
+                              Color.fromARGB(255, 0, 136, 136)
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 5,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Center(
+                                child: Text(
+                                  "Make Your own schedule",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            Icon(Icons.schedule, color: Colors.white, size: 30),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(
+                    height: 10,
+                  ),
                   // Notifications Header
                   Text(
                     "Notifications",

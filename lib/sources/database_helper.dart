@@ -72,6 +72,16 @@ class DatabaseHelper {
         date TEXT NOT NULL
       )
     ''');
+
+    await db.execute('''
+  CREATE TABLE scheduled_walks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    date TEXT NOT NULL,
+    goal_type TEXT NOT NULL,        -- 'time', 'distance', 'steps'
+    goal_value REAL NOT NULL,       -- e.g., 30 mins or 2.5 km or 4000 steps
+    start_time TEXT NOT NULL        -- e.g., "07:30"
+  )
+''');
   }
 
   Future<void> deleteDatabaseFile() async {
@@ -149,24 +159,27 @@ class DatabaseHelper {
     );
   }
 
-
   //--------------------------------------------------------cycling and travelling-----------------------------------------------------------
-   // Insert a cycling or travelling session
-  Future<int> insertCyclingOrTravellingSession(Map<String, dynamic> session, String tableName) async {
+  // Insert a cycling or travelling session
+  Future<int> insertCyclingOrTravellingSession(
+      Map<String, dynamic> session, String tableName) async {
     final db = await instance.database;
-    return await db.insert(tableName == 'cycling' ? 'cycling_sessions' : 'travelling_sessions', session);
+    return await db.insert(
+        tableName == 'cycling' ? 'cycling_sessions' : 'travelling_sessions',
+        session);
   }
 
   // Get all cycling or travelling sessions
-  Future<List<Map<String, dynamic>>> getAllCyclingOrTravellingSessions(String tableName) async {
+  Future<List<Map<String, dynamic>>> getAllCyclingOrTravellingSessions(
+      String tableName) async {
     final db = await instance.database;
-    return await db.query(tableName == 'cycling' ? 'cycling_sessions' : 'travelling_sessions');
+    return await db.query(
+        tableName == 'cycling' ? 'cycling_sessions' : 'travelling_sessions');
   }
 
-
-
   // Get cycling or travelling sessions where step_based = 1
-  Future<List<Map<String, dynamic>>> getDistanceBasedCyclingOrTravellingSessions(String tableName) async {
+  Future<List<Map<String, dynamic>>>
+      getDistanceBasedCyclingOrTravellingSessions(String tableName) async {
     final db = await instance.database;
     return await db.query(
       tableName == 'cycling' ? 'cycling_sessions' : 'travelling_sessions',
@@ -176,7 +189,8 @@ class DatabaseHelper {
   }
 
 // Get cycling or travelling sessions where step_based = 1
-  Future<List<Map<String, dynamic>>> getTimeBsedCyclingOrTravellingSessions(String tableName) async {
+  Future<List<Map<String, dynamic>>> getTimeBsedCyclingOrTravellingSessions(
+      String tableName) async {
     final db = await instance.database;
     return await db.query(
       tableName == 'cycling' ? 'cycling_sessions' : 'travelling_sessions',
@@ -186,7 +200,8 @@ class DatabaseHelper {
   }
 
   // Update a cycling or travelling session
-  Future<int> updateCyclingOrTravellingSession(int id, Map<String, dynamic> session,String tableName) async {
+  Future<int> updateCyclingOrTravellingSession(
+      int id, Map<String, dynamic> session, String tableName) async {
     final db = await instance.database;
     return await db.update(
       tableName == 'cycling' ? 'cycling_sessions' : 'travelling_sessions',
@@ -197,12 +212,54 @@ class DatabaseHelper {
   }
 
   // Delete a cycling or travelling session
-  Future<int> deleteCyclingOrTravellingSession(int id,String tableName) async {
+  Future<int> deleteCyclingOrTravellingSession(int id, String tableName) async {
     final db = await instance.database;
     return await db.delete(
       tableName == 'cycling' ? 'cycling_sessions' : 'travelling_sessions',
       where: 'id = ?',
       whereArgs: [id],
+    );
+  }
+
+  //--------------------------------------------------------SCHEDULED WALKS-----------------------------------------------------------
+// Insert a new schedule
+  Future<int> insertScheduledWalk(Map<String, dynamic> data) async {
+    final db = await instance.database;
+    return await db.insert('scheduled_walks', data);
+  }
+
+// Get all schedules
+  Future<List<Map<String, dynamic>>> getAllScheduledWalks() async {
+    final db = await instance.database;
+    return await db.query('scheduled_walks');
+  }
+
+// Get schedules for a specific date
+  Future<List<Map<String, dynamic>>> getSchedulesByDate(String date) async {
+    final db = await instance.database;
+    return await db.query(
+      'scheduled_walks',
+      where: 'date = ?',
+      whereArgs: [date],
+    );
+  }
+
+// Optional: Delete a schedule
+  Future<int> deleteScheduledWalk(int id) async {
+    final db = await instance.database;
+    return await db.delete(
+      'scheduled_walks',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getRemindersByDate(String date) async {
+    final db = await database;
+    return await db.query(
+      'scheduled_walks',
+      where: 'date = ?',
+      whereArgs: [date],
     );
   }
 }
