@@ -2,15 +2,12 @@ import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:walking_nexus/pages/Homepage.dart';
 import 'package:walking_nexus/services/NotificationHelper.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
+import 'package:walking_nexus/sources/database_helper.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //await DatabaseHelper.instance.deleteDatabaseFile(); // Only for development
-  tz.initializeTimeZones(); // Add this!
-   tz.setLocalLocation(tz.getLocation('Asia/Kolkata')); // Change to your timezone if needed
 
   await NotificationHelper.initialize();
   // Request notification permission

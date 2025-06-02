@@ -200,6 +200,9 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
     String formattedTime =
         "${elapsedTime.inHours.toString().padLeft(2, '0')}:${(elapsedTime.inMinutes % 60).toString().padLeft(2, '0')}:${(elapsedTime.inSeconds % 60).toString().padLeft(2, '0')}";
 
+    speed = truncateTo2Decimals(speed);
+    distance = truncateTo2Decimals(distance);
+
     Map<String, dynamic> sessionData = {
       'time_based': type == 'time' ? 1 : 0,
       'distance_based': type == 'distance' ? 1 : 0,
@@ -214,6 +217,10 @@ class _TravellingDashboardState extends State<TravellingDashboard> {
     await dbHelper.insertCyclingOrTravellingSession(sessionData, '');
     print('Session data saved to database');
     _loadPastSessionData();
+  }
+
+  double truncateTo2Decimals(double value) {
+    return (value * 100).floorToDouble() / 100;
   }
 
   void _startTrackingSpeed() {
