@@ -16,13 +16,23 @@ class Walkingpastdetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // bool targetAchived = (pastData['step_based'] == 1 &&
+    //         (pastData['target_steps'] >= pastData['result_steps'])) ||
+    //     (pastData['distance_based'] == 1 &&
+    //         (pastData['target_distance'] >= pastData['result_distance'])) ||
+    //     (pastData['time_based'] == 1 &&
+    //         (pastData['target_time'] >=
+    //             _parseDuration(pastData['time_spend']).inHours));
+
+    Duration timeSpentDuration = _parseDuration(pastData['time_spend']);
+    double timeSpentInHours = timeSpentDuration.inSeconds / 3600.0;
+
     bool targetAchived = (pastData['step_based'] == 1 &&
-            (pastData['target_steps'] >= pastData['result_steps'])) ||
+            (pastData['result_steps'] >= pastData['target_steps'])) ||
         (pastData['distance_based'] == 1 &&
-            (pastData['target_distance'] >= pastData['result_distance'])) ||
+            (pastData['result_distance'] >= pastData['target_distance'])) ||
         (pastData['time_based'] == 1 &&
-            (pastData['target_time'] >=
-                _parseDuration(pastData['time_spend']).inHours));
+            (timeSpentInHours <= pastData['target_time']));
 
     String TARGET_ACHIEVED = pastData['step_based'] == 1
         ? "Step target ${pastData['target_steps']} achieved!"

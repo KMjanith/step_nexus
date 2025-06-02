@@ -17,11 +17,21 @@ class Cyclingorwalkingpastdetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(pastData['target_time']);
+    print(pastData['time_spend']);
+    // bool targetAchived = (pastData['distance_based'] == 1 &&
+    //         (pastData['target_distance'] >= pastData['result_distance'])) ||
+    //     (pastData['time_based'] == 1 &&
+    //         (pastData['target_time'] >=
+    //             _parseDuration(pastData['time_spend']).inHours));
+
+    Duration duration = _parseDuration(pastData['time_spend']);
+    double timeSpentInHours = duration.inSeconds / 3600.0;
+
     bool targetAchived = (pastData['distance_based'] == 1 &&
-            (pastData['target_distance'] >= pastData['result_distance'])) ||
+            (pastData['result_distance'] >= pastData['target_distance'])) ||
         (pastData['time_based'] == 1 &&
-            (pastData['target_time'] >=
-                _parseDuration(pastData['time_spend']).inHours));
+            (timeSpentInHours <= pastData['target_time']));
 
     String TARGET_ACHIEVED = pastData['distance_based'] == 1
         ? "Distance target ${pastData['target_distance']} km achieved!"
