@@ -67,13 +67,13 @@ class Walkingpastdetails extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0, left: 8.0),
                     child: Text(
-                      targetAchived ? TARGET_NOT_ACHIEVED : TARGET_ACHIEVED,
+                      targetAchived ? TARGET_ACHIEVED : TARGET_NOT_ACHIEVED,
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: targetAchived
-                              ? const Color.fromARGB(255, 255, 126, 126)
-                              : const Color.fromARGB(255, 80, 185, 84)),
+                              ? const Color.fromARGB(255, 80, 185, 84)
+                              : const Color.fromARGB(255, 255, 126, 126))
                     ),
                   ),
                   _topicFilling(targetAchived)
@@ -209,8 +209,8 @@ Widget _topicFilling(bool targetAchived) {
           height: 3,
           decoration: BoxDecoration(
             color: targetAchived
-                ? const Color.fromARGB(255, 255, 174, 174)
-                : const Color.fromARGB(255, 18, 199, 24),
+                ? const Color.fromARGB(255, 18, 199, 24)
+                : const Color.fromARGB(255, 255, 174, 174)
           ),
         );
       },

@@ -60,7 +60,6 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
     super.initState();
     _loadPastSessionData();
   }
-
   void _loadPastSessionData() async {
     final db = DatabaseHelper.instance;
     List<Map<String, dynamic>> latestSession = [];
@@ -136,6 +135,7 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
       }
 
       if (endWindow <= sensorData.length) {
+        endWindow = sensorData.length - 50;
         List<AccelerometerEvent> window =
             sensorData.sublist(startWindow, endWindow);
         int newSteps = Countingsteps.countSteps(window).length;
@@ -143,7 +143,6 @@ class _WalkingRunningDashboardState extends State<WalkingRunningDashboard> {
           steps += newSteps;
         });
         startWindow = endWindow;
-        endWindow += 100;
       }
     });
   }
