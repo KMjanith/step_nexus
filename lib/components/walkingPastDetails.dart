@@ -32,7 +32,7 @@ class Walkingpastdetails extends StatelessWidget {
         (pastData['distance_based'] == 1 &&
             (pastData['result_distance'] >= pastData['target_distance'])) ||
         (pastData['time_based'] == 1 &&
-            (timeSpentInHours <= pastData['target_time']));
+            (timeSpentInHours >= pastData['target_time']));
 
     String TARGET_ACHIEVED = pastData['step_based'] == 1
         ? "Step target ${pastData['target_steps']} achieved!"

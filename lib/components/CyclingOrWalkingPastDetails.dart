@@ -31,7 +31,7 @@ class Cyclingorwalkingpastdetails extends StatelessWidget {
     bool targetAchived = (pastData['distance_based'] == 1 &&
             (pastData['result_distance'] >= pastData['target_distance'])) ||
         (pastData['time_based'] == 1 &&
-            (timeSpentInHours <= pastData['target_time']));
+            (timeSpentInHours >= pastData['target_time']));
 
     String TARGET_ACHIEVED = pastData['distance_based'] == 1
         ? "Distance target ${pastData['target_distance']} km achieved!"
@@ -72,14 +72,13 @@ class Cyclingorwalkingpastdetails extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0, left: 8.0),
                     child: Text(
-                      targetAchived ? TARGET_NOT_ACHIEVED : TARGET_ACHIEVED,
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: targetAchived
-                              ? const Color.fromARGB(255, 255, 126, 126)
-                              : const Color.fromARGB(255, 80, 185, 84)),
-                    ),
+                        targetAchived ? TARGET_ACHIEVED : TARGET_NOT_ACHIEVED,
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: targetAchived
+                                ? const Color.fromARGB(255, 80, 185, 84)
+                                : const Color.fromARGB(255, 255, 126, 126))),
                   ),
                   _topicFilling(targetAchived)
                 ],
@@ -209,8 +208,8 @@ Widget _topicFilling(bool targetAchived) {
           height: 3,
           decoration: BoxDecoration(
             color: targetAchived
-                ? const Color.fromARGB(255, 255, 174, 174)
-                : const Color.fromARGB(255, 175, 255, 178),
+                ? const Color.fromARGB(255, 175, 255, 178)
+                : const Color.fromARGB(255, 255, 174, 174),
           ),
         );
       },
